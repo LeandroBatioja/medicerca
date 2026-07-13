@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: medicerca-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 3000
+
+  - type: pgsql
+    name: medicerca-db
+    plan: free
+    databaseName: medicerca
