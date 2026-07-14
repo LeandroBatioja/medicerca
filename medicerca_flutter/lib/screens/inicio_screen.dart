@@ -18,11 +18,22 @@ class _InicioScreenState extends State<InicioScreen> {
   List<Prescription> _prescriptions = [];
   List<HomeService> _services = [];
   bool _loading = true;
+  int _lastLoadedTab = -1;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = context.read<AppState>();
+    if (appState.currentTab == 0 && appState.currentTab != _lastLoadedTab) {
+      _lastLoadedTab = appState.currentTab;
+      _load();
+    }
   }
 
   Future<void> _load() async {

@@ -19,11 +19,22 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   List<Prescription> _prescriptions = [];
   List<Appointment> _appointments = [];
   bool _loading = true;
+  int _lastLoadedTab = -1;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = context.read<AppState>();
+    if (appState.currentTab == 0 && appState.currentTab != _lastLoadedTab) {
+      _lastLoadedTab = appState.currentTab;
+      _load();
+    }
   }
 
   Future<void> _load() async {

@@ -125,7 +125,7 @@ class Prescription {
       id: json['id'] ?? 0,
       medication: json['medication'] ?? '',
       frequency: json['frequency'],
-      refills: json['refills'],
+      refills: json['refills'] != null ? '${json['refills']}' : null,
       date: json['date'] ?? '',
       doctorId: json['doctor_id'],
       patientId: json['user_id'],

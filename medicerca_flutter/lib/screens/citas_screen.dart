@@ -18,11 +18,22 @@ class _CitasScreenState extends State<CitasScreen> {
   bool _loading = true;
   String? _error;
   bool _isDoctor = false;
+  int _lastLoadedTab = -1;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = context.read<AppState>();
+    if (appState.currentTab == 1 && appState.currentTab != _lastLoadedTab) {
+      _lastLoadedTab = appState.currentTab;
+      _load();
+    }
   }
 
   Future<void> _load() async {

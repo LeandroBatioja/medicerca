@@ -154,6 +154,14 @@ class ApiClient {
     throw ApiException('Respuesta invalida');
   }
 
+  // Doctors
+  Future<List<Patient>> getDoctors() async {
+    final res = await _get('/api/doctors');
+    final body = await _handleResponse(res);
+    final list = _extractList(body);
+    return list.map((d) => Patient.fromJson(d)).toList();
+  }
+
   // Home services
   Future<List<HomeService>> getHomeServices() async {
     final res = await _get('/api/home-services');
