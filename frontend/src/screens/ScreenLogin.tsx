@@ -37,22 +37,34 @@ export function ScreenLogin({
     }
   };
 
+  const inputStyle = (focused: boolean) => ({
+    height: 54,
+    background: COLORS.surface,
+    borderColor: focused ? COLORS.accentText : COLORS.border,
+    color: COLORS.fg,
+    boxShadow: focused ? COLORS.shadow : "none",
+  });
+
   return (
     <div
-      className="flex flex-col items-center px-6 pt-12 pb-10 min-h-screen"
+      className="flex flex-col items-center px-4 pt-14 pb-10 min-h-screen max-w-md mx-auto w-full"
       style={{
-        background: "linear-gradient(160deg, #EAF2FC 0%, #F4F7FB 60%, #EDF5E6 100%)",
+        background: "linear-gradient(180deg, #EAF2FC 0%, #F4F7FB 50%, #F4F7FB 100%)",
       }}
     >
-      <div
-        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 shadow-sm"
-        style={{ background: COLORS.accentBg }}
-      >
-        <Activity size={30} color={COLORS.accentText} strokeWidth={2.5} />
+      {/* Logo */}
+      <div className="mb-6 mt-4">
+        <div
+          className="w-18 h-18 rounded-3xl flex items-center justify-center shadow-md"
+          style={{ background: COLORS.accentBg, width: 72, height: 72 }}
+        >
+          <Activity size={34} color={COLORS.accentText} strokeWidth={2.5} />
+        </div>
       </div>
 
+      {/* Heading */}
       <h1
-        className="text-[22px] font-bold text-center leading-tight mb-1"
+        className="text-[26px] font-bold text-center leading-tight mb-1"
         style={{ fontFamily: "'Lora', serif", color: COLORS.fg }}
       >
         Bienvenido a MediCerca
@@ -61,9 +73,10 @@ export function ScreenLogin({
         Inicia sesion para continuar
       </p>
 
-      <div className="w-full max-w-sm flex flex-col gap-4 mb-5">
+      {/* Form */}
+      <div className="w-full flex flex-col gap-4 mb-5">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[13px] font-medium" style={{ color: COLORS.fg }}>
+          <label className="text-[13px] font-semibold" style={{ color: COLORS.fg }}>
             Email
           </label>
           <input
@@ -71,27 +84,18 @@ export function ScreenLogin({
             value={email}
             onChange={(e) => { setEmail(e.target.value); setError(""); }}
             placeholder="tu@email.com"
-            className="w-full rounded-2xl px-4 text-[16px] outline-none border transition-all"
-            style={{
-              height: 52,
-              background: COLORS.surface,
-              borderColor: email ? COLORS.accentText : COLORS.border,
-              color: COLORS.fg,
-            }}
+            className="w-full rounded-2xl px-4 text-[16px] outline-none border transition-all duration-200"
+            style={inputStyle(!!email)}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-[13px] font-medium" style={{ color: COLORS.fg }}>
+          <label className="text-[13px] font-semibold" style={{ color: COLORS.fg }}>
             Contrasena
           </label>
           <div
-            className="w-full flex items-center gap-2 rounded-2xl px-4 border transition-all"
-            style={{
-              height: 52,
-              background: COLORS.surface,
-              borderColor: password ? COLORS.accentText : COLORS.border,
-            }}
+            className="w-full flex items-center gap-2 rounded-2xl px-4 border transition-all duration-200"
+            style={inputStyle(!!password)}
           >
             <input
               type={showPass ? "text" : "password"}
@@ -104,7 +108,7 @@ export function ScreenLogin({
             <button
               type="button"
               onClick={() => setShowPass((v) => !v)}
-              className="shrink-0 transition-opacity hover:opacity-70"
+              className="shrink-0 p-1 rounded-lg transition-opacity hover:opacity-70"
             >
               {showPass ? <EyeOff size={18} color={COLORS.secondary} /> : <Eye size={18} color={COLORS.secondary} />}
             </button>
@@ -112,37 +116,43 @@ export function ScreenLogin({
         </div>
       </div>
 
+      {/* Error */}
       {error && (
         <div
-          className="w-full max-w-sm flex items-start gap-2 rounded-xl px-3 py-2.5 mb-4"
-          style={{ background: "#FFF0F0", border: "1px solid #FFCDD2" }}
+          className="w-full flex items-start gap-2.5 rounded-2xl px-4 py-3 mb-4"
+          style={{ background: COLORS.errorBg, border: `1px solid ${COLORS.errorBorder}` }}
         >
-          <AlertCircle size={16} color="#C62828" className="mt-0.5 shrink-0" />
-          <p className="text-[13px]" style={{ color: "#C62828" }}>{error}</p>
+          <AlertCircle size={16} color={COLORS.errorText} className="mt-0.5 shrink-0" />
+          <p className="text-[13px]" style={{ color: COLORS.errorText }}>{error}</p>
         </div>
       )}
 
-      <div className="w-full max-w-sm">
-        <ActionButton
-          icon={<Lock size={20} />}
-          label={loading ? "Entrando..." : "Entrar"}
-          variant="primary"
-          height={56}
-          onClick={handleLogin}
-          disabled={!email || !password || loading}
-        />
-      </div>
+      {/* Primary CTA */}
+      <ActionButton
+        icon={<Lock size={20} />}
+        label={loading ? "Entrando..." : "Entrar"}
+        variant="primary"
+        height={56}
+        onClick={handleLogin}
+        disabled={!email || !password || loading}
+      />
 
       <div className="h-3" />
 
-      <div className="w-full max-w-sm">
-        <ActionButton
-          icon={<UserPlus size={20} />}
-          label="Crear cuenta nueva"
-          variant="default"
-          height={56}
-          onClick={() => onNavigate("registro")}
-        />
+      {/* Secondary CTA */}
+      <ActionButton
+        icon={<UserPlus size={20} />}
+        label="Crear cuenta nueva"
+        variant="default"
+        height={56}
+        onClick={() => onNavigate("registro")}
+      />
+
+      {/* Info */}
+      <div className="flex flex-col items-center gap-1 mt-8">
+        <p className="text-[12px]" style={{ color: COLORS.secondary }}>
+          Usa tu email y contrasena para iniciar sesion
+        </p>
       </div>
     </div>
   );

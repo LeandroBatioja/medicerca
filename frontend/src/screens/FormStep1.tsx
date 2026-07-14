@@ -1,64 +1,87 @@
-import { Stethoscope, Activity, FileText } from "lucide-react";
+import { Stethoscope, HeartPulse, Baby, Bone, Microscope, Thermometer } from "lucide-react";
 import { ActionButton } from "../components/ActionButton";
-import { StepDots } from "../components/StepDots";
-import { FooterActions } from "../components/FooterActions";
+import { ScreenHeader } from "../components/ScreenHeader";
 import { COLORS, type Screen, type Booking } from "../types";
 
-export const APPT_TYPES: { id: string; icon: React.ReactNode; label: string }[] = [
-  { id: "general", icon: <Stethoscope size={20} />, label: "Consulta general" },
-  { id: "especialista", icon: <Activity size={20} />, label: "Especialista" },
-  { id: "laboratorio", icon: <FileText size={20} />, label: "Laboratorio" },
-];
-
 export function FormStep1({
-  push,
-  pop,
   booking,
   setBooking,
+  onNavigate,
 }: {
-  push: (s: Screen) => void;
-  pop: () => void;
   booking: Booking;
-  setBooking: (b: Booking) => void;
+  setBooking: React.Dispatch<React.SetStateAction<Booking>>;
+  onNavigate: (s: Screen) => void;
 }) {
-  return (
-    <div className="flex flex-col gap-5 px-4 pt-10 pb-8 min-h-full max-w-md mx-auto w-full">
-      <div className="flex items-center gap-3">
-        <span
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 text-white"
-          style={{ background: COLORS.accentText }}
-        >
-          1
-        </span>
-        <div>
-          <p className="text-[13px]" style={{ color: COLORS.secondary }}>
-            Paso 1 de 3
-          </p>
-          <p className="text-[17px] font-medium" style={{ color: COLORS.fg }}>
-            Elige el tipo de cita
-          </p>
-        </div>
-      </div>
-      <StepDots total={3} current={1} />
+  const options = [
+    { label: "Consulta general", icon: Stethoscope },
+    { label: "Especialidad", icon: HeartPulse },
+    { label: "Pediatria", icon: Baby },
+    { label: "Traumatologia", icon: Bone },
+    { label: "Laboratorio clinico", icon: Microscope },
+    { label: "Urgencias", icon: Thermometer },
+  ];
 
-      <div className="flex flex-col gap-3">
-        {APPT_TYPES.map((t) => (
-          <ActionButton
-            key={t.id}
-            icon={t.icon}
-            label={t.label}
-            variant={booking.type === t.id ? "selected" : "default"}
-            onClick={() => setBooking({ ...booking, type: t.id })}
-          />
-        ))}
+  return (
+    <div className="flex flex-col min-h-screen max-w-md mx-auto w-full" style={{ background: COLORS.bg }}>
+      <ScreenHeader title="Agendar cita" onBack={() => onNavigate("inicio")} />
+
+      <p
+        className="px-5 text-[14px] leading-relaxed mb-5"
+        style={{ color: COLORS.fg, fontWeight: 500 }}
+      >
+        Elige el tipo de cita que necesitas
+      </p>
+
+      <div className="flex flex-col gap-3 px-4 mb-6">
+        {options.map((o) => {
+          const selected = booking.type === o.label;
+          return (
+            <ActionButton
+              key={o.label}
+              icon={<o.icon size={20} />}
+              label={o.label}
+              variant={selected ? "selected" : "default"}
+              height={64}
+              onClick={() =>
+                setBooking((prev) => ({
+                  ...prev,
+                  type: selected ? null : o.label,
+                }))
+              }
+            />
+          );
+        })}
       </div>
 
       <div className="flex-1" />
-      <FooterActions
-        onBack={pop}
-        onNext={() => push("form-step2")}
-        nextEnabled={!!booking.type}
-      />
+
+      <div className="flex gap-3 px-4 pb-8">
+        <button
+          onClick={() => onNavigate("inicio")}
+          className="rounded-3xl border font-medium text-[16px] transition-all duration-200 active:scale-[0.98] hover:bg-[#E6F1FB]/60 flex items-center justify-center cursor-pointer"
+          style={{
+            height: 56,
+            width: "33%",
+            borderColor: COLORS.border,
+            color: COLORS.accentText,
+          }}
+        >
+          Atras
+        </button>
+        <button
+          onClick={() => onNavigate("form-step2")}
+          className="flex-1 rounded-3xl font-medium text-[16px] transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+          style={{
+            height: 56,
+            background: booking.type ? COLORS.accentText : COLORS.disabled,
+            color: booking.type ? "#fff" : COLORS.secondary,
+            cursor: booking.type ? "pointer" : "not-allowed",
+            boxShadow: booking.type ? COLORS.shadowMd : "none",
+          }}
+        >
+          Continuar &rarr;
+        </button>
+      </div>
     </div>
   );
 }

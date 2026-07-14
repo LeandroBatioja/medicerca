@@ -18,3 +18,35 @@ html, body, #root {
 input:focus {
   outline: none;
 }
+
+input::placeholder {
+  opacity: 0.5;
+}
+
+/* Smooth scrolling */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(24, 95, 165, 0.2);
+  border-radius: 4px;
+}
+
+/* Focus ring for accessibility */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #185FA5;
+  outline-offset: 2px;
+}

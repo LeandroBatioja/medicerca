@@ -1,96 +1,129 @@
-import { useState } from "react";
-import { Stethoscope, Activity, User, MapPin, Check, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Ambulance, AlertCircle, MapPin } from "lucide-react";
 import { ScreenHeader } from "../components/ScreenHeader";
-import { COLORS } from "../types";
+import { COLORS, type Screen, type HomeService } from "../types";
+import { api } from "../api";
 
-const SERVICIOS = [
-  { icon: <Stethoscope size={20} />, label: "Consulta domiciliaria", desc: "Medico a tu hogar en 2-4 h" },
-  { icon: <Activity size={20} />, label: "Toma de muestras", desc: "Laboratorio en casa - lunes a sabado" },
-  { icon: <User size={20} />, label: "Enfermeria", desc: "Cuidado post-operatorio y curacion" },
-];
+export function ScreenAsistencia({
+  onNavigate,
+}: {
+  onNavigate: (s: Screen) => void;
+}) {
+  const [services, setServices] = useState<HomeService[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-export function ScreenAsistencia({ pop }: { pop: () => void }) {
-  const [sel, setSel] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoading(true);
+      try {
+        const data = await api.getHomeServices();
+        setServices(data);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Error al cargar servicios");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-full max-w-md mx-auto w-full">
-      <ScreenHeader title="Asistencia en casa" onBack={pop} />
-      <div className="flex flex-col gap-3 px-4 pt-4 pb-8">
-        <p className="text-[14px]" style={{ color: COLORS.secondary }}>
-          Selecciona el servicio que necesitas y un medico o enfermero llegara a tu domicilio registrado.
+    <div className="flex flex-col min-h-screen max-w-md mx-auto w-full" style={{ background: COLORS.bg }}>
+      <ScreenHeader title="Servicios a domicilio" onBack={() => onNavigate("inicio")} />
+
+      {/* Info banner */}
+      <div
+        className="mx-4 mb-5 rounded-2xl p-4"
+        style={{ background: COLORS.accentBg }}
+      >
+        <p className="text-[13px] font-semibold" style={{ color: COLORS.accentText }}>
+          Servicios medicos disponibles en tu zona. Contacta para agendar una visita.
         </p>
-
-        <div
-          className="rounded-2xl border p-3 flex items-center gap-3"
-          style={{ borderColor: COLORS.border, background: COLORS.surface }}
-        >
-          <MapPin size={18} color={COLORS.accentText} className="shrink-0" />
-          <div>
-            <p className="text-[13px]" style={{ color: COLORS.secondary }}>
-              Direccion registrada
-            </p>
-            <p className="text-[15px] font-medium" style={{ color: COLORS.fg }}>
-              Av. Insurgentes 1234, Col. Del Valle
-            </p>
-          </div>
-        </div>
-
-        {SERVICIOS.map((s) => {
-          const active = sel === s.label;
-          return (
-            <button
-              key={s.label}
-              onClick={() => setSel(active ? null : s.label)}
-              className="rounded-2xl border p-4 flex gap-3 items-center text-left transition-all active:scale-[0.98]"
-              style={{
-                background: active ? COLORS.accentBg : COLORS.surface,
-                borderColor: active ? COLORS.accentText : COLORS.border,
-                borderWidth: active ? 2 : 1,
-              }}
-            >
-              <span
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{
-                  background: active ? COLORS.accentText : COLORS.accentBg,
-                }}
-              >
-                <span style={{ color: active ? "#fff" : COLORS.accentText }}>
-                  {s.icon}
-                </span>
-              </span>
-              <div className="flex-1">
-                <p
-                  className="text-[16px] font-semibold"
-                  style={{ color: active ? COLORS.accentText : COLORS.fg }}
-                >
-                  {s.label}
-                </p>
-                <p
-                  className="text-[13px] mt-0.5"
-                  style={{ color: COLORS.secondary }}
-                >
-                  {s.desc}
-                </p>
-              </div>
-              {active && (
-                <Check size={18} color={COLORS.accentText} className="shrink-0" />
-              )}
-            </button>
-          );
-        })}
-
-        <button
-          className="w-full flex items-center justify-center gap-2 rounded-2xl font-medium text-[16px] mt-2 active:scale-[0.98] transition-all"
-          style={{
-            minHeight: 56,
-            background: sel ? COLORS.accentText : "#D5DFE8",
-            color: sel ? "#fff" : COLORS.secondary,
-            cursor: sel ? "pointer" : "not-allowed",
-            boxShadow: sel ? "0 4px 16px rgba(24,95,165,0.2)" : "none",
-          }}
-        >
-          Solicitar servicio <ChevronRight size={18} />
-        </button>
       </div>
+
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-[15px]" style={{ color: COLORS.secondary }}>Cargando...</p>
+        </div>
+      ) : error ? (
+        <div className="mx-4 flex items-start gap-2.5 rounded-2xl px-4 py-3"
+          style={{ background: COLORS.errorBg, border: `1px solid ${COLORS.errorBorder}` }}
+        >
+          <AlertCircle size={16} color={COLORS.errorText} className="mt-0.5 shrink-0" />
+          <p className="text-[13px]" style={{ color: COLORS.errorText }}>{error}</p>
+        </div>
+      ) : services.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
+            style={{ background: COLORS.accentBg }}
+          >
+            <Ambulance size={32} color={COLORS.accentText} />
+          </div>
+          <p
+            className="text-[18px] font-semibold text-center mb-2"
+            style={{ color: COLORS.fg, fontFamily: "'Lora', serif" }}
+          >
+            Sin servicios activos
+          </p>
+          <p className="text-[14px] text-center" style={{ color: COLORS.secondary }}>
+            No tienes servicios a domicilio agendados actualmente.
+          </p>
+        </div>
+      ) : (
+        <div className="px-4 flex flex-col gap-3">
+          {services.map((svc) => {
+            const statusColor =
+              svc.status === "completado"
+                ? COLORS.successText
+                : svc.status === "pendiente"
+                  ? COLORS.warningText
+                  : COLORS.accentText;
+            const statusBg =
+              svc.status === "completado"
+                ? COLORS.successBg
+                : svc.status === "pendiente"
+                  ? COLORS.warningBg
+                  : COLORS.accentBg;
+            return (
+              <div
+                key={svc.id}
+                className="rounded-3xl p-5"
+                style={{ background: COLORS.surface, boxShadow: COLORS.shadow, border: `1px solid ${COLORS.border}` }}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                    style={{ background: statusBg }}
+                  >
+                    <Ambulance size={20} color={statusColor} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[17px] font-semibold" style={{ color: COLORS.fg }}>
+                        {svc.service_type}
+                      </p>
+                      <span
+                        className="text-[12px] font-semibold px-2.5 py-1 rounded-xl"
+                        style={{ background: statusBg, color: statusColor }}
+                      >
+                        {svc.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <MapPin size={13} color={COLORS.secondary} />
+                      <p className="text-[13px]" style={{ color: COLORS.secondary }}>
+                        {svc.address}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

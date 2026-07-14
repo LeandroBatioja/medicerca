@@ -41,33 +41,33 @@ function AppContent() {
     setBooking({ type: null, slot: null });
   };
 
-  const goHome = () => {
-    setStack(["inicio"]);
-    setBooking({ type: null, slot: null });
+  const handleConfirm = async () => {
+    await api.createAppointment(booking.type || "", booking.slot || "", "Sin asignar", "Sin asignar");
+    push("confirmacion");
   };
 
   const renderScreen = () => {
     switch (current) {
       case "login":
-        return <ScreenLogin onLogin={handleLogin} onNavigate={(s) => push(s)} />;
+        return <ScreenLogin onLogin={handleLogin} onNavigate={push} />;
       case "registro":
-        return <ScreenRegistro onNavigate={(s) => push(s)} onBack={pop} />;
+        return <ScreenRegistro onNavigate={push} onBack={pop} />;
       case "inicio":
-        return <ScreenInicio push={push} userName={userName} onLogout={handleLogout} />;
+        return <ScreenInicio onNavigate={push} userName={userName} onLogout={handleLogout} />;
       case "form-step1":
-        return <FormStep1 push={push} pop={pop} booking={booking} setBooking={setBooking} />;
+        return <FormStep1 booking={booking} setBooking={setBooking} onNavigate={push} />;
       case "form-step2":
-        return <FormStep2 push={push} pop={pop} booking={booking} setBooking={setBooking} />;
+        return <FormStep2 booking={booking} setBooking={setBooking} onNavigate={push} />;
       case "form-step3":
-        return <FormStep3 push={push} pop={pop} booking={booking} />;
+        return <FormStep3 booking={booking} onNavigate={push} onConfirm={handleConfirm} />;
       case "confirmacion":
-        return <ScreenConfirmacion booking={booking} goHome={goHome} />;
+        return <ScreenConfirmacion onNavigate={push} userName={userName} />;
       case "recetas":
-        return <ScreenRecetas pop={pop} />;
+        return <ScreenRecetas onNavigate={push} />;
       case "asistencia":
-        return <ScreenAsistencia pop={pop} />;
+        return <ScreenAsistencia onNavigate={push} />;
       case "soporte":
-        return <ScreenSoporte pop={pop} />;
+        return <ScreenSoporte onNavigate={push} />;
     }
   };
 

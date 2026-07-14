@@ -1,59 +1,105 @@
-import { Calendar, Pill, Home, HeadphonesIcon, LogOut } from "lucide-react";
+import {
+  Stethoscope,
+  Pill,
+  Ambulance,
+  Calendar,
+  LogOut,
+  Activity,
+} from "lucide-react";
 import { ActionButton } from "../components/ActionButton";
 import { COLORS, type Screen } from "../types";
-import { api } from "../api";
 
 export function ScreenInicio({
-  push,
-  userName,
+  onNavigate,
   onLogout,
+  userName,
 }: {
-  push: (s: Screen) => void;
-  userName: string;
+  onNavigate: (s: Screen) => void;
   onLogout: () => void;
+  userName: string;
 }) {
-  const handleLogout = () => {
-    api.logout();
-    onLogout();
-  };
-
   return (
-    <div className="flex flex-col gap-3 px-4 pt-14 pb-8 max-w-md mx-auto w-full">
-      <div className="flex flex-col items-center text-center mb-2">
-        <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-          style={{ background: COLORS.accentBg }}
-        >
-          <Calendar size={26} color={COLORS.accentText} />
+    <div
+      className="flex flex-col px-4 pt-14 pb-10 min-h-screen max-w-md mx-auto w-full"
+      style={{ background: COLORS.bg }}
+    >
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div
+            className="w-12 h-12 rounded-2xl flex items-center justify-center"
+            style={{ background: COLORS.accentBg }}
+          >
+            <Activity size={22} color={COLORS.accentText} strokeWidth={2.5} />
+          </div>
+          <div>
+            <p className="text-[13px]" style={{ color: COLORS.secondary }}>
+              Bienvenido
+            </p>
+            <h1
+              className="text-[22px] font-bold"
+              style={{ color: COLORS.fg, fontFamily: "'Lora', serif" }}
+            >
+              Hola, {userName}
+            </h1>
+          </div>
         </div>
-        <h1
-          className="text-[22px] font-semibold leading-tight"
-          style={{ fontFamily: "'Lora', serif", color: COLORS.fg }}
-        >
-          Hola, {userName}
-        </h1>
-        <p className="mt-1 text-[16px] leading-relaxed" style={{ color: COLORS.secondary }}>
-          Que deseas hacer hoy?
-        </p>
       </div>
 
-      <ActionButton icon={<Calendar size={20} />} label="Agendar cita" variant="primary" onClick={() => push("form-step1")} />
-      <ActionButton icon={<Pill size={20} />} label="Ver recetas" variant="default" onClick={() => push("recetas")} />
-      <ActionButton icon={<Home size={20} />} label="Asistencia en casa" variant="default" onClick={() => push("asistencia")} />
-      <ActionButton icon={<HeadphonesIcon size={20} />} label="Soporte" variant="default" onClick={() => push("soporte")} />
-
-      <div className="flex flex-col items-center gap-3 mt-4">
-        <p className="text-[13px]" style={{ color: COLORS.secondary }}>
-          Ultima visita: 12 de junio, 2026
-        </p>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 text-[14px] font-medium transition-opacity hover:opacity-70"
-          style={{ color: COLORS.secondary }}
-        >
-          <LogOut size={16} /> Cerrar sesion
-        </button>
+      {/* Main CTA */}
+      <div className="mb-6">
+        <ActionButton
+          icon={<Calendar size={20} />}
+          label="Agendar cita"
+          variant="primary"
+          height={68}
+          onClick={() => onNavigate("form-step1")}
+        />
       </div>
+
+      {/* Section title */}
+      <p
+        className="text-[13px] font-semibold uppercase tracking-wider mb-3 px-1"
+        style={{ color: COLORS.secondary }}
+      >
+        Secciones
+      </p>
+
+      {/* Options */}
+      <div className="flex flex-col gap-3">
+        <ActionButton
+          icon={<Stethoscope size={20} />}
+          label="Servicios a domicilio"
+          variant="default"
+          height={68}
+          onClick={() => onNavigate("asistencia")}
+        />
+        <ActionButton
+          icon={<Pill size={20} />}
+          label="Mis recetas"
+          variant="default"
+          height={68}
+          onClick={() => onNavigate("recetas")}
+        />
+        <ActionButton
+          icon={<Ambulance size={20} />}
+          label="Centro de soporte"
+          variant="default"
+          height={68}
+          onClick={() => onNavigate("soporte")}
+        />
+      </div>
+
+      <div className="flex-1" />
+
+      {/* Logout */}
+      <ActionButton
+        icon={<LogOut size={20} />}
+        label="Cerrar sesion"
+        variant="ghost"
+        height={54}
+        onClick={onLogout}
+      />
     </div>
   );
 }

@@ -16,27 +16,25 @@ export function FooterActions({
     <div className="flex gap-3 px-4 pb-8">
       <button
         onClick={onBack}
-        className="flex items-center justify-center gap-1 rounded-2xl border font-medium text-[16px] transition-all active:scale-[0.98] hover:bg-[#E6F1FB]/60"
+        className="flex items-center justify-center gap-1 rounded-3xl border font-medium text-[16px] transition-all duration-200 active:scale-[0.98] hover:bg-[#E6F1FB]/60 cursor-pointer"
         style={{
           minHeight: 56,
           width: "33%",
-          borderColor: "rgba(24,95,165,0.2)",
+          borderColor: COLORS.border,
           color: COLORS.accentText,
         }}
       >
-        <ChevronLeft size={18} /> Atrás
+        <ChevronLeft size={18} /> Atras
       </button>
       <button
         onClick={nextEnabled ? onNext : undefined}
-        className="flex items-center justify-center gap-2 rounded-2xl font-medium text-[16px] transition-all active:scale-[0.98] flex-1"
+        className="flex items-center justify-center gap-2 rounded-3xl font-medium text-[16px] transition-all duration-200 active:scale-[0.98] flex-1 cursor-pointer"
         style={{
           minHeight: 56,
-          background: nextEnabled ? COLORS.accentText : "#D5DFE8",
+          background: nextEnabled ? COLORS.accentText : COLORS.disabled,
           color: nextEnabled ? "#fff" : COLORS.secondary,
           cursor: nextEnabled ? "pointer" : "not-allowed",
-          boxShadow: nextEnabled
-            ? "0 4px 16px rgba(24,95,165,0.22)"
-            : "none",
+          boxShadow: nextEnabled ? COLORS.shadowMd : "none",
         }}
       >
         {nextLabel} <ChevronRight size={18} />
