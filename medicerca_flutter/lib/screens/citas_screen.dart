@@ -17,6 +17,7 @@ class _CitasScreenState extends State<CitasScreen> {
   List<Appointment> _appointments = [];
   bool _loading = true;
   String? _error;
+  bool _isDoctor = false;
 
   @override
   void initState() {
@@ -31,7 +32,10 @@ class _CitasScreenState extends State<CitasScreen> {
     });
     try {
       final appState = context.read<AppState>();
-      final list = await appState.api.getAppointments();
+      _isDoctor = appState.role == UserRole.doctor;
+      final list = _isDoctor
+          ? await appState.api.getDoctorAppointments()
+          : await appState.api.getAppointments();
       if (mounted) {
         setState(() {
           _appointments = list;
@@ -52,17 +56,18 @@ class _CitasScreenState extends State<CitasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis citas'),
+        title: Text(_isDoctor ? 'Citas asignadas' : 'Mis citas'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const FormStep1Screen()),
-              );
-            },
-          ),
+          if (!_isDoctor)
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FormStep1Screen()),
+                );
+              },
+            ),
         ],
       ),
       body: _buildBody(),
@@ -71,7 +76,8 @@ class _CitasScreenState extends State<CitasScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const Center(
+          child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (_error != null) {
       return Center(
@@ -80,15 +86,15 @@ class _CitasScreenState extends State<CitasScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.textTertiary),
+              const Icon(Icons.error_outline,
+                  size: 48, color: AppColors.textTertiary),
               const SizedBox(height: 12),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.dmSans(color: AppColors.textSecondary),
-              ),
+              Text(_error!,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.dmSans(color: AppColors.textSecondary)),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: _load, child: const Text('Reintentar')),
+              ElevatedButton(
+                  onPressed: _load, child: const Text('Reintentar')),
             ],
           ),
         ),
@@ -99,7 +105,8 @@ class _CitasScreenState extends State<CitasScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.event_outlined, size: 48, color: AppColors.textTertiary),
+            const Icon(Icons.event_outlined,
+                size: 48, color: AppColors.textTertiary),
             const SizedBox(height: 12),
             Text(
               'No hay citas',
@@ -111,20 +118,26 @@ class _CitasScreenState extends State<CitasScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Agenda tu primera cita',
-              style: GoogleFonts.dmSans(fontSize: 13, color: AppColors.textSecondary),
+              _isDoctor
+                  ? 'Las citas que te asignen apareceran aqui'
+                  : 'Agenda tu primera cita',
+              style: GoogleFonts.dmSans(
+                  fontSize: 13, color: AppColors.textSecondary),
             ),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const FormStep1Screen()),
-                );
-              },
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Nueva cita'),
-            ),
+            if (!_isDoctor) ...[
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const FormStep1Screen()),
+                  );
+                },
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Nueva cita'),
+              ),
+            ],
           ],
         ),
       );
@@ -134,7 +147,94 @@ class _CitasScreenState extends State<CitasScreen> {
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: _appointments.length,
-        itemBuilder: (context, i) => _AppointmentCard(appointment: _appointments[i]),
+        itemBuilder: (context, i) => GestureDetector(
+          onTap: () => _showDetail(_appointments[i]),
+          child: _AppointmentCard(appointment: _appointments[i]),
+        ),
+      ),
+    );
+  }
+
+  void _showDetail(Appointment appointment) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              appointment.typeDisplay,
+              style: GoogleFonts.dmSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _DetailRow(
+                icon: Icons.person_outline,
+                label: 'Doctor',
+                value: appointment.doctor ?? 'No asignado'),
+            const SizedBox(height: 12),
+            _DetailRow(
+                icon: Icons.location_on_outlined,
+                label: 'Clinica',
+                value: appointment.clinic ?? 'No especificada'),
+            const SizedBox(height: 12),
+            _DetailRow(
+                icon: Icons.access_time,
+                label: 'Dia',
+                value: appointment.date ?? 'Sin fecha'),
+            const SizedBox(height: 12),
+            _DetailRow(
+                icon: Icons.schedule,
+                label: 'Hora',
+                value: appointment.time ?? 'Sin hora'),
+            const SizedBox(height: 12),
+            _DetailRow(
+              icon: appointment.confirmed
+                  ? Icons.check_circle_outline
+                  : Icons.hourglass_empty_outlined,
+              label: 'Estado',
+              value: appointment.confirmed ? 'Confirmada' : 'Pendiente',
+              valueColor: appointment.confirmed
+                  ? AppColors.success
+                  : AppColors.warning,
+            ),
+            if (_isDoctor && appointment.patientName != null) ...[
+              const SizedBox(height: 12),
+              _DetailRow(
+                  icon: Icons.person,
+                  label: 'Paciente',
+                  value: appointment.patientName!),
+            ],
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cerrar'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -207,12 +307,14 @@ class _AppointmentCard extends StatelessWidget {
                 if (appointment.doctor != null)
                   Text(
                     appointment.doctor!,
-                    style: GoogleFonts.dmSans(fontSize: 12, color: AppColors.textSecondary),
+                    style: GoogleFonts.dmSans(
+                        fontSize: 12, color: AppColors.textSecondary),
                   ),
                 if (appointment.clinic != null)
                   Text(
                     appointment.clinic!,
-                    style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.textTertiary),
+                    style: GoogleFonts.dmSans(
+                        fontSize: 11, color: AppColors.textTertiary),
                   ),
               ],
             ),
@@ -223,18 +325,23 @@ class _AppointmentCard extends StatelessWidget {
               if (appointment.date != null)
                 Text(
                   appointment.date!,
-                  style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.textTertiary),
+                  style: GoogleFonts.dmSans(
+                      fontSize: 11, color: AppColors.textTertiary),
                 ),
               if (appointment.time != null)
                 Text(
                   appointment.time!,
-                  style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.textTertiary),
+                  style: GoogleFonts.dmSans(
+                      fontSize: 11, color: AppColors.textTertiary),
                 ),
               const SizedBox(height: 4),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: appointment.confirmed ? AppColors.successBg : AppColors.warningBg,
+                  color: appointment.confirmed
+                      ? AppColors.successBg
+                      : AppColors.warningBg,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -242,7 +349,9 @@ class _AppointmentCard extends StatelessWidget {
                   style: GoogleFonts.dmSans(
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: appointment.confirmed ? AppColors.success : AppColors.warning,
+                    color: appointment.confirmed
+                        ? AppColors.success
+                        : AppColors.warning,
                   ),
                 ),
               ),
@@ -250,6 +359,46 @@ class _AppointmentCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? valueColor;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.textTertiary),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: GoogleFonts.dmSans(
+                      fontSize: 11, color: AppColors.textTertiary)),
+              Text(value,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: valueColor ?? AppColors.textPrimary,
+                  )),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -5,6 +5,7 @@ import '../config/constants.dart';
 import '../config/models.dart';
 import '../providers/app_state.dart';
 import 'crear_receta_screen.dart';
+import 'pacientes_screen.dart';
 
 class DoctorDashboardScreen extends StatefulWidget {
   const DoctorDashboardScreen({super.key});
@@ -31,7 +32,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       final results = await Future.wait([
         appState.api.getPatients(),
         appState.api.getCreatedPrescriptions(),
-        appState.api.getAppointments(),
+        appState.api.getDoctorAppointments(),
       ]);
       if (mounted) {
         setState(() {
@@ -125,9 +126,22 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             Row(
               children: [
                 _DoctorQuickAction(
+                  icon: Icons.people_outline,
+                  label: 'Mis\npacientes',
+                  color: AppColors.primary,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const PacientesScreen()),
+                    );
+                  },
+                ),
+                const SizedBox(width: 10),
+                _DoctorQuickAction(
                   icon: Icons.add_circle_outline,
                   label: 'Nueva\nreceta',
-                  color: AppColors.primary,
+                  color: AppColors.success,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -135,13 +149,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                           builder: (_) => const CrearRecetaScreen()),
                     );
                   },
-                ),
-                const SizedBox(width: 10),
-                _DoctorQuickAction(
-                  icon: Icons.people_outline,
-                  label: 'Mis\npacientes',
-                  color: AppColors.success,
-                  onTap: () => appState.switchTab(2),
                 ),
                 const SizedBox(width: 10),
                 _DoctorQuickAction(
@@ -164,15 +171,21 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               children: [
                 Expanded(
                     child: _DoctorStat(
-                        value: '${_patients.length}', label: 'Pacientes', color: AppColors.primary)),
+                        value: '${_patients.length}',
+                        label: 'Pacientes',
+                        color: AppColors.primary)),
                 const SizedBox(width: 10),
                 Expanded(
                     child: _DoctorStat(
-                        value: '${_prescriptions.length}', label: 'Recetas', color: AppColors.success)),
+                        value: '${_prescriptions.length}',
+                        label: 'Recetas',
+                        color: AppColors.success)),
                 const SizedBox(width: 10),
                 Expanded(
                     child: _DoctorStat(
-                        value: '${_appointments.length}', label: 'Citas', color: AppColors.warning)),
+                        value: '${_appointments.length}',
+                        label: 'Citas',
+                        color: AppColors.warning)),
               ],
             ),
             const SizedBox(height: 20),
@@ -192,7 +205,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       icon: Icons.event,
                       color: AppColors.primary,
                       title: a.typeDisplay,
-                      subtitle: a.doctor ?? a.clinic ?? '',
+                      subtitle: a.patientName ?? '',
                       time: a.date ?? '',
                     ),
                   )),
@@ -224,7 +237,8 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               Center(
                 child: Column(
                   children: [
-                    Icon(Icons.medical_services_outlined, size: 48, color: AppColors.textTertiary),
+                    Icon(Icons.medical_services_outlined,
+                        size: 48, color: AppColors.textTertiary),
                     const SizedBox(height: 12),
                     Text(
                       'Bienvenido Dr. ${user?.fullName.split(' ').first ?? ''}',
@@ -327,8 +341,8 @@ class _DoctorStat extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style:
-                GoogleFonts.dmSans(fontSize: 11, color: AppColors.textSecondary),
+            style: GoogleFonts.dmSans(
+                fontSize: 11, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -395,8 +409,8 @@ class _ActivityItem extends StatelessWidget {
           if (time.isNotEmpty)
             Text(
               time,
-              style:
-                  GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
+              style: GoogleFonts.dmSans(
+                  fontSize: 10, color: AppColors.textTertiary),
             ),
         ],
       ),

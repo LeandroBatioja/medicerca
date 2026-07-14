@@ -225,6 +225,10 @@ class _CrearRecetaScreenState extends State<CrearRecetaScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Frecuencia (ej: Cada 8 horas)',
                 ),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Frecuencia requerida';
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 

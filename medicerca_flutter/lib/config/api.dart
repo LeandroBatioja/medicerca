@@ -83,10 +83,30 @@ class ApiClient {
     return list.map((a) => Appointment.fromJson(a)).toList();
   }
 
-  Future<Map<String, dynamic>> createAppointment(int slotId, String type) async {
+  Future<List<Appointment>> getDoctorAppointments() async {
+    final res = await _get('/api/appointments/doctor');
+    final body = await _handleResponse(res);
+    final list = _extractList(body);
+    return list.map((a) => Appointment.fromJson(a)).toList();
+  }
+
+  Future<Map<String, dynamic>> createAppointment({
+    required int slotId,
+    required String type,
+    required String doctor,
+    required String clinic,
+    int? doctorId,
+    String? date,
+    String? time,
+  }) async {
     final res = await _post('/api/appointments', body: {
       'slotId': slotId,
       'type': type,
+      'doctor': doctor,
+      'clinic': clinic,
+      if (doctorId != null) 'doctorId': doctorId,
+      if (date != null) 'date': date,
+      if (time != null) 'time': time,
     });
     final body = await _handleResponse(res);
     if (body is! Map<String, dynamic>) throw ApiException('Respuesta invalida');
@@ -140,5 +160,18 @@ class ApiClient {
     final body = await _handleResponse(res);
     final list = _extractList(body);
     return list.map((h) => HomeService.fromJson(h)).toList();
+  }
+
+  Future<Map<String, dynamic>> createHomeService({
+    required String serviceType,
+    required String address,
+  }) async {
+    final res = await _post('/api/home-services', body: {
+      'serviceType': serviceType,
+      'address': address,
+    });
+    final body = await _handleResponse(res);
+    if (body is! Map<String, dynamic>) throw ApiException('Respuesta invalida');
+    return body;
   }
 }

@@ -23,12 +23,19 @@ export async function initDB() {
       CREATE TABLE IF NOT EXISTS appointments (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        doctor_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         type TEXT NOT NULL,
         slot_id TEXT NOT NULL,
         doctor TEXT NOT NULL,
         clinic TEXT NOT NULL,
+        date TEXT,
+        time TEXT,
         confirmed_at TIMESTAMPTZ DEFAULT now()
       );
+
+      ALTER TABLE appointments ADD COLUMN IF NOT EXISTS doctor_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
+      ALTER TABLE appointments ADD COLUMN IF NOT EXISTS date TEXT;
+      ALTER TABLE appointments ADD COLUMN IF NOT EXISTS time TEXT;
 
       CREATE TABLE IF NOT EXISTS prescriptions (
         id SERIAL PRIMARY KEY,

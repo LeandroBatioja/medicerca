@@ -49,6 +49,9 @@ class Appointment {
   final String? date;
   final String? time;
   final bool confirmed;
+  final int? doctorId;
+  final String? patientName;
+  final String? patientEmail;
 
   Appointment({
     required this.id,
@@ -59,18 +62,24 @@ class Appointment {
     this.date,
     this.time,
     this.confirmed = false,
+    this.doctorId,
+    this.patientName,
+    this.patientEmail,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
       id: json['id'] ?? 0,
       type: json['type'] ?? '',
-      slotId: json['slotId'],
+      slotId: json['slot_id'] is int ? json['slot_id'] : int.tryParse('${json['slot_id'] ?? ''}'),
       doctor: json['doctor'],
       clinic: json['clinic'],
       date: json['date'],
       time: json['time'],
-      confirmed: json['confirmed'] ?? false,
+      confirmed: json['confirmed_at'] != null,
+      doctorId: json['doctor_id'],
+      patientName: json['patient_name'],
+      patientEmail: json['patient_email'],
     );
   }
 
@@ -118,8 +127,8 @@ class Prescription {
       frequency: json['frequency'],
       refills: json['refills'],
       date: json['date'] ?? '',
-      doctorId: json['doctorId'],
-      patientId: json['patientId'],
+      doctorId: json['doctor_id'],
+      patientId: json['user_id'],
       patientName: json['patientName'] ?? json['patient_name'],
       doctorName: json['doctorName'] ?? json['doctor_name'],
     );
@@ -219,13 +228,19 @@ class Slot {
 class Booking {
   final String type;
   final Slot? slot;
+  final String? doctor;
+  final String? clinic;
+  final int? doctorId;
 
-  const Booking({this.type = '', this.slot});
+  const Booking({this.type = '', this.slot, this.doctor, this.clinic, this.doctorId});
 
-  Booking copyWith({String? type, Slot? slot, bool clearSlot = false}) {
+  Booking copyWith({String? type, Slot? slot, bool clearSlot = false, String? doctor, String? clinic, int? doctorId}) {
     return Booking(
       type: type ?? this.type,
       slot: clearSlot ? null : (slot ?? this.slot),
+      doctor: doctor ?? this.doctor,
+      clinic: clinic ?? this.clinic,
+      doctorId: doctorId ?? this.doctorId,
     );
   }
 }

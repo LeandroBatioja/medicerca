@@ -4,6 +4,7 @@ import '../config/constants.dart';
 import '../config/models.dart';
 import '../providers/app_state.dart';
 import 'package:provider/provider.dart';
+import 'solicitar_servicio_screen.dart';
 
 class AsistenciaScreen extends StatefulWidget {
   const AsistenciaScreen({super.key});
@@ -50,14 +51,29 @@ class _AsistenciaScreenState extends State<AsistenciaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Asistencia a domicilio')),
+      appBar: AppBar(
+        title: const Text('Asistencia a domicilio'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const SolicitarServicioScreen()),
+              );
+            },
+          ),
+        ],
+      ),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const Center(
+          child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (_error != null) {
       return Center(
@@ -66,12 +82,16 @@ class _AsistenciaScreenState extends State<AsistenciaScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.textTertiary),
+              const Icon(Icons.error_outline,
+                  size: 48, color: AppColors.textTertiary),
               const SizedBox(height: 12),
-              Text(_error!, textAlign: TextAlign.center,
-                  style: GoogleFonts.dmSans(color: AppColors.textSecondary)),
+              Text(_error!,
+                  textAlign: TextAlign.center,
+                  style:
+                      GoogleFonts.dmSans(color: AppColors.textSecondary)),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: _load, child: const Text('Reintentar')),
+              ElevatedButton(
+                  onPressed: _load, child: const Text('Reintentar')),
             ],
           ),
         ),
@@ -82,13 +102,30 @@ class _AsistenciaScreenState extends State<AsistenciaScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.medical_services_outlined, size: 48, color: AppColors.textTertiary),
+            const Icon(Icons.medical_services_outlined,
+                size: 48, color: AppColors.textTertiary),
             const SizedBox(height: 12),
-            Text('No hay servicios', style: GoogleFonts.dmSans(
-                fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+            Text('No hay servicios',
+                style: GoogleFonts.dmSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary)),
             const SizedBox(height: 4),
             Text('Los servicios de asistencia apareceran aqui',
-                style: GoogleFonts.dmSans(fontSize: 13, color: AppColors.textSecondary)),
+                style: GoogleFonts.dmSans(
+                    fontSize: 13, color: AppColors.textSecondary)),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const SolicitarServicioScreen()),
+                );
+              },
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Solicitar servicio'),
+            ),
           ],
         ),
       );
@@ -98,9 +135,111 @@ class _AsistenciaScreenState extends State<AsistenciaScreen> {
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: _services.length,
-        itemBuilder: (context, i) => _ServiceCard(service: _services[i]),
+        itemBuilder: (context, i) => GestureDetector(
+          onTap: () => _showDetail(_services[i]),
+          child: _ServiceCard(service: _services[i]),
+        ),
       ),
     );
+  }
+
+  void _showDetail(HomeService service) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              service.serviceName ?? service.displayType,
+              style: GoogleFonts.dmSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _DetailRow(
+              icon: Icons.category_outlined,
+              label: 'Tipo',
+              value: service.displayType,
+            ),
+            const SizedBox(height: 12),
+            _DetailRow(
+              icon: Icons.location_on_outlined,
+              label: 'Direccion',
+              value: service.address ?? 'No especificada',
+            ),
+            const SizedBox(height: 12),
+            _DetailRow(
+              icon: Icons.info_outline,
+              label: 'Estado',
+              value: _statusLabel(service.status),
+              valueColor: _statusColor(service.status),
+            ),
+            if (service.createdAt != null) ...[
+              const SizedBox(height: 12),
+              _DetailRow(
+                icon: Icons.access_time,
+                label: 'Fecha',
+                value: service.createdAt!,
+              ),
+            ],
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cerrar'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _statusColor(String? status) {
+    switch (status) {
+      case 'completed':
+        return AppColors.success;
+      case 'pending':
+        return AppColors.warning;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return AppColors.textTertiary;
+    }
+  }
+
+  String _statusLabel(String? status) {
+    switch (status) {
+      case 'completed':
+        return 'Completado';
+      case 'pending':
+        return 'Pendiente';
+      case 'cancelled':
+        return 'Cancelado';
+      default:
+        return status ?? 'Desconocido';
+    }
   }
 }
 
@@ -186,7 +325,8 @@ class _ServiceCard extends StatelessWidget {
                 if (service.address != null)
                   Text(
                     service.address!,
-                    style: GoogleFonts.dmSans(fontSize: 12, color: AppColors.textSecondary),
+                    style: GoogleFonts.dmSans(
+                        fontSize: 12, color: AppColors.textSecondary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -210,6 +350,46 @@ class _ServiceCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? valueColor;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.textTertiary),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: GoogleFonts.dmSans(
+                      fontSize: 11, color: AppColors.textTertiary)),
+              Text(value,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: valueColor ?? AppColors.textPrimary,
+                  )),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

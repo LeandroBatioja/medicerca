@@ -13,6 +13,7 @@ import 'asistencia_screen.dart';
 import 'citas_screen.dart';
 import 'perfil_screen.dart';
 import 'crear_receta_screen.dart';
+import 'pacientes_screen.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key});
@@ -42,7 +43,7 @@ class _MainShellBody extends StatelessWidget {
         DoctorDashboardScreen(),
         CitasScreen(),
         RecetasScreen(),
-        AsistenciaScreen(),
+        PacientesScreen(),
         PerfilScreen(),
       ];
 
@@ -98,7 +99,8 @@ class AppSidebar extends StatelessWidget {
                     gradient: AppColors.primaryGradient,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.local_hospital, color: Colors.white, size: 22),
+                  child: const Icon(Icons.local_hospital,
+                      color: Colors.white, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -138,7 +140,19 @@ class AppSidebar extends StatelessWidget {
             active: appState.currentTab == 3,
             onTap: () => appState.switchTab(3),
           ),
-          if (isDoctor)
+          if (isDoctor) ...[
+            const Divider(color: Color(0xFF334155), height: 1, indent: 16, endIndent: 16),
+            _SidebarItem(
+              icon: Icons.people_outline,
+              label: 'Mis pacientes',
+              active: false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PacientesScreen()),
+                );
+              },
+            ),
             _SidebarItem(
               icon: Icons.add_circle_outline,
               label: 'Nueva receta',
@@ -146,10 +160,12 @@ class AppSidebar extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const CrearRecetaScreen()),
+                  MaterialPageRoute(
+                      builder: (_) => const CrearRecetaScreen()),
                 );
               },
             ),
+          ],
           _SidebarItem(
             icon: Icons.person_outline,
             label: 'Perfil',
@@ -204,13 +220,15 @@ class AppSidebar extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.logout, size: 18, color: AppColors.textTertiary),
+                  icon: const Icon(Icons.logout,
+                      size: 18, color: AppColors.textTertiary),
                   onPressed: () async {
                     await appState.logout();
                     if (context.mounted) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const LoginScreen()),
                       );
                     }
                   },
@@ -240,7 +258,8 @@ class _SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: active ? Colors.white : AppColors.textTertiary, size: 20),
+      leading: Icon(icon,
+          color: active ? Colors.white : AppColors.textTertiary, size: 20),
       title: Text(
         label,
         style: GoogleFonts.dmSans(

@@ -5,8 +5,16 @@ import '../config/constants.dart';
 import '../providers/app_state.dart';
 import 'confirmacion_screen.dart';
 
-class FormStep3Screen extends StatelessWidget {
+class FormStep3Screen extends StatefulWidget {
   const FormStep3Screen({super.key});
+
+  @override
+  State<FormStep3Screen> createState() => _FormStep3ScreenState();
+}
+
+class _FormStep3ScreenState extends State<FormStep3Screen> {
+  bool _submitting = false;
+  String? _error;
 
   @override
   Widget build(BuildContext context) {
@@ -105,41 +113,55 @@ class FormStep3Screen extends StatelessWidget {
                     const SizedBox(height: 12),
                     _SummaryRow(label: 'Hora', value: booking.slot?.time ?? ''),
                     const SizedBox(height: 12),
-                    _SummaryRow(label: 'Doctor', value: 'Dr. Garcia'),
+                    _SummaryRow(
+                        label: 'Doctor',
+                        value: booking.doctor ?? 'Dr. Garcia'),
                     const SizedBox(height: 12),
                     _SummaryRow(
-                        label: 'Clinica', value: 'Centro Medico MediCerca'),
+                        label: 'Clinica',
+                        value: booking.clinic ?? 'Centro Medico MediCerca'),
                   ],
                 ),
               ),
+              if (_error != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(top: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Text(_error!,
+                      style: GoogleFonts.dmSans(
+                          fontSize: 13, color: Colors.red.shade700)),
+                ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    await Future.delayed(const Duration(milliseconds: 500));
-                    if (!context.mounted) return;
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const ConfirmacionScreen()),
-                      (_) => false,
-                    );
-                  },
+                  onPressed: _submitting ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text(
-                    'Confirmar cita',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _submitting
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : Text(
+                          'Confirmar cita',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ],
@@ -147,6 +169,42 @@ class FormStep3Screen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _submit() async {
+    final appState = context.read<AppState>();
+    final booking = appState.booking;
+
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
+
+    try {
+      await appState.api.createAppointment(
+        slotId: booking.slot?.id ?? 1,
+        type: booking.type.isNotEmpty ? booking.type : 'general',
+        doctor: booking.doctor ?? 'Dr. Garcia',
+        clinic: booking.clinic ?? 'Centro Medico MediCerca',
+        doctorId: booking.doctorId,
+        date: booking.slot?.day,
+        time: booking.slot?.time,
+      );
+
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const ConfirmacionScreen()),
+        (_) => false,
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'Error al agendar: $e';
+          _submitting = false;
+        });
+      }
+    }
   }
 }
 
@@ -163,12 +221,15 @@ class _SummaryRow extends StatelessWidget {
         Text(label,
             style: GoogleFonts.dmSans(
                 fontSize: 13, color: AppColors.textSecondary)),
-        Text(
-          value,
-          style: GoogleFonts.dmSans(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+        Flexible(
+          child: Text(
+            value,
+            style: GoogleFonts.dmSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+            textAlign: TextAlign.end,
           ),
         ),
       ],

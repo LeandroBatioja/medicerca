@@ -8,7 +8,12 @@ router.use(authMiddleware);
 router.get("/", async (req: AuthRequest, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, medication, frequency, refills, date, doctor_id FROM prescriptions WHERE user_id = $1 ORDER BY date DESC",
+      `SELECT p.id, p.medication, p.frequency, p.refills, p.date, p.doctor_id,
+              u.full_name as doctor_name
+       FROM prescriptions p
+       LEFT JOIN users u ON u.id = p.doctor_id
+       WHERE p.user_id = $1
+       ORDER BY p.date DESC`,
       [req.userId]
     );
     res.json(result.rows);
@@ -38,8 +43,22 @@ router.get("/created", async (req: AuthRequest, res) => {
 router.get("/patients", async (req: AuthRequest, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, full_name, email FROM users WHERE role = 'patient' ORDER BY full_name"
+      `SELECT DISTINCT u.id, u.full_name, u.email
+       FROM users u
+       JOIN prescriptions p ON p.user_id = u.id
+       WHERE p.doctor_id = $1 AND u.role = 'patient'
+       ORDER BY u.full_name`,
+      [req.userId]
     );
+
+    if (result.rows.length === 0) {
+      const allPatients = await pool.query(
+        "SELECT id, full_name, email FROM users WHERE role = 'patient' ORDER BY full_name"
+      );
+      res.json(allPatients.rows);
+      return;
+    }
+
     res.json(result.rows);
   } catch (err) {
     console.error("Get patients error:", err);
@@ -58,15 +77,15 @@ router.post("/", async (req: AuthRequest, res) => {
 
   const { medication, frequency, refills, date, patientId } = req.body;
 
-  if (!medication || !frequency || !patientId) {
-    res.status(400).json({ error: "Faltan campos: medication, frequency, patientId" });
+  if (!medication || !patientId) {
+    res.status(400).json({ error: "Faltan campos: medication, patientId" });
     return;
   }
 
   try {
     const result = await pool.query(
       "INSERT INTO prescriptions (user_id, doctor_id, medication, frequency, refills, date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-      [patientId, callerId, medication, frequency, refills || 0, date || new Date().toISOString().slice(0, 10)]
+      [patientId, callerId, medication, frequency || "No especificada", refills || 0, date || new Date().toISOString().slice(0, 10)]
     );
     res.status(201).json({ id: result.rows[0].id });
   } catch (err) {
