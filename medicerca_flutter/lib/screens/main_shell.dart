@@ -11,6 +11,8 @@ import 'doctor_dashboard_screen.dart';
 import 'recetas_screen.dart';
 import 'asistencia_screen.dart';
 import 'citas_screen.dart';
+import 'perfil_screen.dart';
+import 'crear_receta_screen.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key});
@@ -18,30 +20,22 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
-
     if (!appState.isLoggedIn) {
       return const LoginScreen();
     }
-
     return const _MainShellBody();
   }
 }
 
-class _MainShellBody extends StatefulWidget {
+class _MainShellBody extends StatelessWidget {
   const _MainShellBody();
-
-  @override
-  State<_MainShellBody> createState() => _MainShellBodyState();
-}
-
-class _MainShellBodyState extends State<_MainShellBody> {
-  int _currentIndex = 0;
 
   List<Widget> get _patientScreens => const [
         InicioScreen(),
         CitasScreen(),
         RecetasScreen(),
         AsistenciaScreen(),
+        PerfilScreen(),
       ];
 
   List<Widget> get _doctorScreens => const [
@@ -49,26 +43,28 @@ class _MainShellBodyState extends State<_MainShellBody> {
         CitasScreen(),
         RecetasScreen(),
         AsistenciaScreen(),
+        PerfilScreen(),
       ];
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
-    final screens = appState.role == UserRole.doctor ? _doctorScreens : _patientScreens;
+    final isDoctor = appState.role == UserRole.doctor;
+    final screens = isDoctor ? _doctorScreens : _patientScreens;
     final isWide = MediaQuery.of(context).size.width > 800;
 
     return Scaffold(
       body: Row(
         children: [
           if (isWide) const AppSidebar(),
-          Expanded(child: screens[_currentIndex]),
+          Expanded(child: screens[appState.currentTab]),
         ],
       ),
       bottomNavigationBar: isWide
           ? null
           : MobileTabBar(
-              currentIndex: _currentIndex,
-              onTap: (i) => setState(() => _currentIndex = i),
+              currentIndex: appState.currentTab,
+              onTap: (i) => appState.switchTab(i),
               role: appState.role,
             ),
     );
@@ -91,7 +87,6 @@ class AppSidebar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Logo
           Container(
             padding: const EdgeInsets.all(20),
             child: Row(
@@ -119,38 +114,49 @@ class AppSidebar extends StatelessWidget {
           ),
           const Divider(color: Color(0xFF334155), height: 1),
           const SizedBox(height: 8),
-
-          // Nav items
           _SidebarItem(
             icon: Icons.home_outlined,
             label: 'Inicio',
-            onTap: () {},
+            active: appState.currentTab == 0,
+            onTap: () => appState.switchTab(0),
           ),
           _SidebarItem(
             icon: Icons.calendar_today_outlined,
             label: 'Citas',
-            onTap: () {},
+            active: appState.currentTab == 1,
+            onTap: () => appState.switchTab(1),
           ),
           _SidebarItem(
             icon: Icons.receipt_long_outlined,
             label: 'Recetas',
-            onTap: () {},
+            active: appState.currentTab == 2,
+            onTap: () => appState.switchTab(2),
           ),
           _SidebarItem(
             icon: Icons.medical_services_outlined,
-            label: 'Asistencia',
-            onTap: () {},
+            label: 'Servicios',
+            active: appState.currentTab == 3,
+            onTap: () => appState.switchTab(3),
           ),
           if (isDoctor)
             _SidebarItem(
               icon: Icons.add_circle_outline,
               label: 'Nueva receta',
-              onTap: () {},
+              active: false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CrearRecetaScreen()),
+                );
+              },
             ),
-
+          _SidebarItem(
+            icon: Icons.person_outline,
+            label: 'Perfil',
+            active: appState.currentTab == 4,
+            onTap: () => appState.switchTab(4),
+          ),
           const Spacer(),
-
-          // User info
           Container(
             margin: const EdgeInsets.all(12),
             padding: const EdgeInsets.all(12),
@@ -221,28 +227,32 @@ class AppSidebar extends StatelessWidget {
 class _SidebarItem extends StatelessWidget {
   final IconData icon;
   final String label;
+  final bool active;
   final VoidCallback onTap;
 
   const _SidebarItem({
     required this.icon,
     required this.label,
+    required this.active,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.textTertiary, size: 20),
+      leading: Icon(icon, color: active ? Colors.white : AppColors.textTertiary, size: 20),
       title: Text(
         label,
         style: GoogleFonts.dmSans(
           fontSize: 14,
-          color: Colors.white.withAlpha(200),
+          fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+          color: active ? Colors.white : Colors.white.withAlpha(180),
         ),
       ),
       dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      tileColor: active ? const Color(0xFF334155) : Colors.transparent,
       onTap: onTap,
     );
   }

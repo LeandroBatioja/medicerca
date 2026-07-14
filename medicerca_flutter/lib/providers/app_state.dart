@@ -12,6 +12,7 @@ class AppState extends ChangeNotifier {
   Booking _booking = const Booking();
   bool _isLoading = false;
   bool _initialized = false;
+  int _currentTab = 0;
 
   User? get user => _user;
   String? get token => _token;
@@ -20,6 +21,12 @@ class AppState extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get initialized => _initialized;
   bool get isLoggedIn => _token != null && _user != null;
+  int get currentTab => _currentTab;
+
+  void switchTab(int index) {
+    _currentTab = index;
+    notifyListeners();
+  }
 
   void _setLoading(bool v) {
     _isLoading = v;
@@ -89,6 +96,7 @@ class AppState extends ChangeNotifier {
     _token = token;
     _user = user;
     _role = user.role;
+    _currentTab = 0;
     api.setToken(token);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
@@ -103,6 +111,7 @@ class AppState extends ChangeNotifier {
     _user = null;
     _role = UserRole.patient;
     _booking = const Booking();
+    _currentTab = 0;
     api.setToken(null);
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');

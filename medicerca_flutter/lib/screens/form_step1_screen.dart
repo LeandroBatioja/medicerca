@@ -34,128 +34,147 @@ class FormStep1Screen extends StatelessWidget {
     final appState = context.watch<AppState>();
     final selectedType = appState.booking.type;
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            Text(
-              'Nueva cita',
-              style: GoogleFonts.lora(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Selecciona el tipo de consulta',
-              style: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 8),
-            // Progress
-            Row(
-              children: [
-                _ProgressDot(active: true),
-                const SizedBox(width: 6),
-                Expanded(child: Container(height: 3, color: AppColors.border)),
-                const SizedBox(width: 6),
-                _ProgressDot(active: false),
-                const SizedBox(width: 6),
-                Expanded(child: Container(height: 3, color: AppColors.border)),
-                const SizedBox(width: 6),
-                _ProgressDot(active: false),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.separated(
-                itemCount: _types.length,
-                separatorBuilder: (_, index) => const SizedBox(height: 10),
-                itemBuilder: (context, i) {
-                  final t = _types[i];
-                  final isSelected = selectedType == t.type;
-                  return GestureDetector(
-                    onTap: () {
-                      appState.updateBooking(appState.booking.copyWith(type: t.type, clearSlot: true));
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryBg : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.border,
-                          width: isSelected ? 2 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary.withAlpha(20) : AppColors.bg,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(
-                              t.icon,
-                              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  t.title,
-                                  style: GoogleFonts.dmSans(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  t.description,
-                                  style: GoogleFonts.dmSans(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (isSelected)
-                            const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
-                        ],
-                      ),
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios, size: 20),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Nueva cita',
+                    style: GoogleFonts.lora(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: selectedType.isEmpty
-                    ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const FormStep2Screen()),
+              Text(
+                'Selecciona el tipo de consulta',
+                style: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _ProgressDot(active: true),
+                  const SizedBox(width: 6),
+                  Expanded(child: Container(height: 3, color: AppColors.border)),
+                  const SizedBox(width: 6),
+                  _ProgressDot(active: false),
+                  const SizedBox(width: 6),
+                  Expanded(child: Container(height: 3, color: AppColors.border)),
+                  const SizedBox(width: 6),
+                  _ProgressDot(active: false),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _types.length,
+                  separatorBuilder: (_, index) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) {
+                    final t = _types[i];
+                    final isSelected = selectedType == t.type;
+                    return GestureDetector(
+                      onTap: () {
+                        appState.updateBooking(
+                          appState.booking.copyWith(type: t.type, clearSlot: true),
                         );
                       },
-                child: const Text('Siguiente'),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.primaryBg : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? AppColors.primary : AppColors.border,
+                            width: isSelected ? 2 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.primary.withAlpha(20)
+                                    : AppColors.bg,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                t.icon,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    t.title,
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: isSelected
+                                          ? AppColors.primary
+                                          : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.description,
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isSelected)
+                              const Icon(Icons.check_circle,
+                                  color: AppColors.primary, size: 22),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: selectedType.isEmpty
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const FormStep2Screen()),
+                          );
+                        },
+                  child: const Text('Siguiente'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

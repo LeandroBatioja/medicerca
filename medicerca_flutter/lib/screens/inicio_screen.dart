@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../config/constants.dart';
 import '../providers/app_state.dart';
+import 'soporte_screen.dart';
 
 class InicioScreen extends StatelessWidget {
   const InicioScreen({super.key});
@@ -12,7 +13,8 @@ class InicioScreen extends StatelessWidget {
     final appState = context.watch<AppState>();
     final user = appState.user;
     final hour = DateTime.now().hour;
-    final greeting = hour < 12 ? 'Buenos dias' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
+    final greeting =
+        hour < 12 ? 'Buenos dias' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -20,7 +22,6 @@ class InicioScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Row(
               children: [
                 CircleAvatar(
@@ -74,42 +75,43 @@ class InicioScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Quick actions
             Row(
               children: [
                 _QuickAction(
                   icon: Icons.calendar_today_outlined,
                   label: 'Citas',
                   color: AppColors.primary,
-                  onTap: () {},
+                  onTap: () => appState.switchTab(1),
                 ),
                 const SizedBox(width: 10),
                 _QuickAction(
                   icon: Icons.receipt_long_outlined,
                   label: 'Recetas',
                   color: AppColors.success,
-                  onTap: () {},
+                  onTap: () => appState.switchTab(2),
                 ),
                 const SizedBox(width: 10),
                 _QuickAction(
                   icon: Icons.medical_services_outlined,
                   label: 'Servicios',
                   color: AppColors.warning,
-                  onTap: () {},
+                  onTap: () => appState.switchTab(3),
                 ),
                 const SizedBox(width: 10),
                 _QuickAction(
                   icon: Icons.headset_mic_outlined,
                   label: 'Ayuda',
                   color: const Color(0xFF8B5CF6),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SoporteScreen()),
+                    );
+                  },
                 ),
               ],
             ),
             const SizedBox(height: 20),
-
-            // Upcoming appointment card
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -166,11 +168,12 @@ class InicioScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 36,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => appState.switchTab(1),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                       child: Text(
                         'Ver detalles',
@@ -185,20 +188,22 @@ class InicioScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Stats
             Row(
               children: [
-                Expanded(child: _StatCard(value: '12', label: 'Visitas', color: AppColors.primary)),
+                Expanded(
+                  child: _StatCard(value: '12', label: 'Visitas', color: AppColors.primary),
+                ),
                 const SizedBox(width: 10),
-                Expanded(child: _StatCard(value: '3', label: 'Recetas', color: AppColors.success)),
+                Expanded(
+                  child: _StatCard(value: '3', label: 'Recetas', color: AppColors.success),
+                ),
                 const SizedBox(width: 10),
-                Expanded(child: _StatCard(value: '5', label: 'Servicios', color: AppColors.warning)),
+                Expanded(
+                  child: _StatCard(value: '5', label: 'Servicios', color: AppColors.warning),
+                ),
               ],
             ),
             const SizedBox(height: 20),
-
-            // Recent activity
             Text(
               'Actividad reciente',
               style: GoogleFonts.dmSans(
@@ -303,19 +308,12 @@ class _StatCard extends StatelessWidget {
         children: [
           Text(
             value,
-            style: GoogleFonts.dmSans(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
+            style: GoogleFonts.dmSans(fontSize: 22, fontWeight: FontWeight.w700, color: color),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: GoogleFonts.dmSans(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-            ),
+            style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -373,20 +371,14 @@ class _ActivityTile extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 11,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
           Text(
             time,
-            style: GoogleFonts.dmSans(
-              fontSize: 10,
-              color: AppColors.textTertiary,
-            ),
+            style: GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
           ),
         ],
       ),

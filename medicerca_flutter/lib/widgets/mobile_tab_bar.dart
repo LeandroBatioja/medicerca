@@ -19,14 +19,16 @@ class MobileTabBar extends StatelessWidget {
         _TabItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Inicio'),
         _TabItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: 'Citas'),
         _TabItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Recetas'),
-        _TabItem(icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services, label: 'Asistencia'),
+        _TabItem(icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services, label: 'Servicios'),
+        _TabItem(icon: Icons.person_outline, activeIcon: Icons.person, label: 'Perfil'),
       ];
 
   List<_TabItem> get _doctorTabs => const [
         _TabItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Inicio'),
-        _TabItem(icon: Icons.add_circle_outline, activeIcon: Icons.add_circle, label: 'Recetas'),
-        _TabItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Mis Recetas'),
-        _TabItem(icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services, label: 'Asistencia'),
+        _TabItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: 'Citas'),
+        _TabItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Recetas'),
+        _TabItem(icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services, label: 'Servicios'),
+        _TabItem(icon: Icons.person_outline, activeIcon: Icons.person, label: 'Perfil'),
       ];
 
   @override
