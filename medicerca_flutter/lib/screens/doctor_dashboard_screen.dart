@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../config/constants.dart';
 import '../providers/app_state.dart';
+import 'crear_receta_screen.dart';
 
 class DoctorDashboardScreen extends StatelessWidget {
   const DoctorDashboardScreen({super.key});
@@ -12,7 +13,8 @@ class DoctorDashboardScreen extends StatelessWidget {
     final appState = context.watch<AppState>();
     final user = appState.user;
     final hour = DateTime.now().hour;
-    final greeting = hour < 12 ? 'Buenos dias' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
+    final greeting =
+        hour < 12 ? 'Buenos dias' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -20,7 +22,6 @@ class DoctorDashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Row(
               children: [
                 CircleAvatar(
@@ -42,7 +43,8 @@ class DoctorDashboardScreen extends StatelessWidget {
                     children: [
                       Text(
                         '$greeting,',
-                        style: GoogleFonts.dmSans(fontSize: 13, color: AppColors.textSecondary),
+                        style: GoogleFonts.dmSans(
+                            fontSize: 13, color: AppColors.textSecondary),
                       ),
                       Text(
                         'Dr. ${user?.fullName.split(' ').first ?? ''}',
@@ -55,7 +57,6 @@ class DoctorDashboardScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                // New prescription button
                 Container(
                   height: 40,
                   decoration: BoxDecoration(
@@ -63,7 +64,13 @@ class DoctorDashboardScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const CrearRecetaScreen()),
+                      );
+                    },
                     icon: const Icon(Icons.add, size: 18, color: Colors.white),
                     label: const Text('Nueva receta'),
                     style: ElevatedButton.styleFrom(
@@ -77,54 +84,60 @@ class DoctorDashboardScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Quick actions
             Row(
               children: [
                 _DoctorQuickAction(
                   icon: Icons.add_circle_outline,
                   label: 'Nueva\nreceta',
                   color: AppColors.primary,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const CrearRecetaScreen()),
+                    );
+                  },
                 ),
                 const SizedBox(width: 10),
                 _DoctorQuickAction(
                   icon: Icons.people_outline,
                   label: 'Mis\npacientes',
                   color: AppColors.success,
-                  onTap: () {},
+                  onTap: () => appState.switchTab(2),
                 ),
                 const SizedBox(width: 10),
                 _DoctorQuickAction(
                   icon: Icons.receipt_long_outlined,
                   label: 'Recetas\ncreadas',
                   color: AppColors.warning,
-                  onTap: () {},
+                  onTap: () => appState.switchTab(2),
                 ),
                 const SizedBox(width: 10),
                 _DoctorQuickAction(
                   icon: Icons.calendar_today_outlined,
                   label: 'Citas\nhoy',
                   color: const Color(0xFF8B5CF6),
-                  onTap: () {},
+                  onTap: () => appState.switchTab(1),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-
-            // Stats
             Row(
               children: [
-                Expanded(child: _DoctorStat(value: '28', label: 'Pacientes', color: AppColors.primary)),
+                Expanded(
+                    child: _DoctorStat(
+                        value: '28', label: 'Pacientes', color: AppColors.primary)),
                 const SizedBox(width: 10),
-                Expanded(child: _DoctorStat(value: '15', label: 'Recetas', color: AppColors.success)),
+                Expanded(
+                    child: _DoctorStat(
+                        value: '15', label: 'Recetas', color: AppColors.success)),
                 const SizedBox(width: 10),
-                Expanded(child: _DoctorStat(value: '6', label: 'Citas hoy', color: AppColors.warning)),
+                Expanded(
+                    child: _DoctorStat(
+                        value: '6', label: 'Citas hoy', color: AppColors.warning)),
               ],
             ),
             const SizedBox(height: 20),
-
-            // Recent activity
             Text(
               'Actividad reciente',
               style: GoogleFonts.dmSans(
@@ -216,7 +229,8 @@ class _DoctorStat extends StatelessWidget {
   final String label;
   final Color color;
 
-  const _DoctorStat({required this.value, required this.label, required this.color});
+  const _DoctorStat(
+      {required this.value, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -231,12 +245,14 @@ class _DoctorStat extends StatelessWidget {
         children: [
           Text(
             value,
-            style: GoogleFonts.dmSans(fontSize: 22, fontWeight: FontWeight.w700, color: color),
+            style: GoogleFonts.dmSans(
+                fontSize: 22, fontWeight: FontWeight.w700, color: color),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.textSecondary),
+            style:
+                GoogleFonts.dmSans(fontSize: 11, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -294,14 +310,16 @@ class _ActivityItem extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.textSecondary),
+                  style: GoogleFonts.dmSans(
+                      fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
           Text(
             time,
-            style: GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
+            style:
+                GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
           ),
         ],
       ),
