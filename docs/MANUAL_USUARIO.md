@@ -4,6 +4,8 @@
 
 MediCerca es una aplicacion movil que te permite gestionar tus servicios medicos desde tu celular: agendar citas, ver recetas, solicitar asistencia en domicilio y obtener soporte.
 
+Diseñada siguiendo las heuristicas de Nielsen para adultos mayores: tipografia grande (minimo 16sp), alto contraste (WCAG AA 4.5:1), botones amplios (minimo 48dp), feedback claro en cada accion y navegacion simple.
+
 ---
 
 ## Instalar la app
@@ -19,9 +21,9 @@ MediCerca es una aplicacion movil que te permite gestionar tus servicios medicos
 
 1. Abre la app MediCerca
 2. Ingresa tu **email** y **contrasena**
-3. Pulsa **Entrar**
+3. Pulsa **Iniciar sesion** (con icono de login)
 
-Si no tienes cuenta, pulsa **Crear cuenta nueva** y completa:
+Si no tienes cuenta, pulsa **Registrate** y completa:
 - Nombre completo
 - Email
 - Contrasena (minimo 6 caracteres)
@@ -37,34 +39,40 @@ Despues de iniciar sesion, ves 5 pestañas en la barra inferior:
 
 | Tab | Icono | Funcion |
 |---|---|---|
-| Inicio | 🏠 | Dashboard con resumen de citas, recetas y servicios |
-| Citas | 📅 | Ver, crear y cancelar citas |
-| Recetas | 📋 | Ver recetas medicas activas |
-| Servicios | 🏥 | Solicitar servicios a domicilio |
-| Perfil | 👤 | Ver perfil y cerrar sesion |
+| Inicio | Casa | Dashboard con resumen de citas, recetas y servicios |
+| Citas | Calendario | Ver, crear y eliminar citas |
+| Recetas | Recibo | Ver recetas medicas activas |
+| Servicios | Medicos | Solicitar servicios a domicilio |
+| Perfil | Persona | Ver perfil y cerrar sesion |
 
 ### Doctores
 
 | Tab | Icono | Funcion |
 |---|---|---|
-| Inicio | 🏠 | Dashboard con pacientes, recetas y citas |
-| Citas | 📅 | Ver citas asignadas |
-| Recetas | 📋 | Ver recetas creadas y pacientes |
-| Servicios | 🏥 | Ver servicios disponibles |
-| Perfil | 👤 | Ver perfil y cerrar sesion |
+| Inicio | Casa | Dashboard con pacientes, recetas y citas |
+| Citas | Calendario | Ver citas asignadas por pacientes |
+| Recetas | Recibo | Ver recetas creadas |
+| Pacientes | Personas | Ver lista de pacientes con citas |
+| Perfil | Persona | Ver perfil y cerrar sesion |
+
+Los doctores tambien tienen acceso rapido desde el dashboard a:
+- **Mis pacientes** — Lista de pacientes
+- **Nueva receta** — Crear receta para un paciente
 
 ---
 
 ## Agendar Cita (Paciente)
 
-El flujo tiene 3 pasos:
+El flujo tiene 3 pasos (indicado con texto "Paso 1 de 3", "Paso 2 de 3", "Paso 3 de 3"):
 
-### Paso 1: Tipo de cita
+### Paso 1: Tipo de cita y doctor
 
 Selecciona el tipo de consulta:
 - **Consulta general** — Revision medica general
 - **Seguimiento** — Consulta de seguimiento
 - **Urgencia** — Atencion de urgencia
+
+Luego selecciona el **doctor** al que quieres asistir del dropdown.
 
 ### Paso 2: Fecha y hora
 
@@ -75,7 +83,7 @@ Selecciona uno de los horarios disponibles en la cuadricula.
 Revisa los datos de tu cita:
 - Tipo de cita
 - Fecha y hora seleccionada
-- Medico asignado
+- Doctor asignado
 - Clinica
 
 Pulsa **Confirmar cita** para finalizar.
@@ -83,6 +91,26 @@ Pulsa **Confirmar cita** para finalizar.
 ### Confirmacion
 
 Se muestra un mensaje de exito con el resumen. Tu cita se guarda automaticamente en el sistema.
+
+---
+
+## Gestionar Citas
+
+### Ver detalle de una cita
+
+Toca cualquier tarjeta de cita para ver sus detalles completos:
+- Tipo de consulta
+- Doctor asignado
+- Clinica
+- Dia y hora
+- Estado (Confirmada o Pendiente)
+- Nombre del paciente (solo doctores)
+
+### Eliminar una cita
+
+Desde el detalle de la cita, pulsa el boton rojo **Eliminar** (con icono de basura). Se te pedira confirmacion antes de eliminar.
+
+Tanto el paciente como el doctor pueden eliminar una cita.
 
 ---
 
@@ -95,10 +123,13 @@ Muestra la lista de recetas medicas activas. Cada receta incluye:
 - Frecuencia de consumo
 - Numero de recargas disponibles
 - Fecha de la receta
+- Nombre del doctor que la creo
 
 ### Doctores
 
 Muestra las recetas que has creado. Puedes crear nuevas recetas desde el dashboard pulsando **Nueva receta**.
+
+Al crear una receta, solo aparecen los pacientes que tienen al menos una cita contigo.
 
 ---
 
@@ -106,13 +137,18 @@ Muestra las recetas que has creado. Puedes crear nuevas recetas desde el dashboa
 
 Permite solicitar servicios medicos a domicilio.
 
-### Servicios disponibles
+### Solicitar un servicio
 
-Selecciona el servicio que necesitas:
-- **Enfermeria** — Cuidado post-operatorio y curacion
-- **Laboratorio** — Toma de muestras a domicilio
-- **Fisioterapia** — Rehabilitacion fisica
-- **Medicamentos** — Entrega de medicamentos
+1. En el tab Servicios, pulsa **Solicitar servicio**
+2. Selecciona el tipo de servicio:
+   - **Enfermeria** — Cuidado post-operatorio y curacion
+   - **Laboratorio** — Toma de muestras a domicilio
+   - **Fisioterapia** — Rehabilitacion fisica
+   - **Medicamentos** — Entrega de medicamentos
+3. Escribe tu direccion
+4. Pulsa **Enviar solicitud**
+
+Toca una tarjeta de servicio existente para ver sus detalles.
 
 ---
 
@@ -120,8 +156,7 @@ Selecciona el servicio que necesitas:
 
 ### Contacto directo
 
-- **Llamar** — Linea 800 123 4567
-- **Chat** — Respuesta en aproximadamente 2 minutos
+- **Llamar** — Linea 800 123 4567 (pulsa el boton para marcar directamente)
 
 ### Preguntas frecuentes
 
@@ -133,7 +168,7 @@ Toca una pregunta para ver su respuesta.
 
 En el tab **Perfil**:
 - Ve tu nombre, email y rol
-- Pulsa **Cerrar sesion** para salir de la app
+- Pulsa **Cerrar sesion** para salir de la app (con confirmacion)
 
 ---
 
@@ -148,12 +183,31 @@ El diseno se adapta automaticamente al tamano de pantalla.
 
 ---
 
+## Accesibilidad (Nielsen para adultos mayores)
+
+La app sigue las heuristicas de Nielsen y directrices WCAG para usuarios mayores de 65:
+
+| Aspecto | Estandar aplicado |
+|---|---|
+| Tipografia minima | 16sp para todo el texto cuerpo |
+| Contraste de colores | Minimo 4.5:1 (WCAG AA) |
+| Tamano de botones | Minimo 48dp de altura |
+| Iconos con etiquetas | Todos los botones criticos tienen texto + icono |
+| Feedback de accion | Spinner + texto en cada carga ("Cargando...", "Iniciando sesion...") |
+| Mensajes de error | Icono + mensaje claro + boton reintentar |
+| Navegacion | Labels de pasos ("Paso 1 de 3"), tooltips en acciones importantes |
+| Pull-to-refresh | En dashboards para actualizar datos |
+| Dialogos de confirmacion | Antes de acciones destructivas (eliminar cita, cerrar sesion) |
+
+---
+
 ## Solucion de problemas
 
 | Problema | Solucion |
 |---|---|
 | No puedo iniciar sesion | Verifica email y contrasena |
 | La app no carga | Verifica tu conexion a internet |
-| No se agendo la cita | Intenta de nuevo o contacta soporte |
+| No se agendo la cita | Verifica que seleccionaste tipo + doctor |
 | Error de conexion | El servidor puede tardar ~30s en despertar (Render free tier) |
 | La app no se instala | Habilita "Fuentes desconocidas" en ajustes de Android |
+| Las citas no se ven | Desliza hacia abajo para actualizar (pull-to-refresh) |

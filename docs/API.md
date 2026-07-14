@@ -79,6 +79,30 @@ Iniciar sesion.
 
 ---
 
+## Doctors [AUTH]
+
+### GET /api/doctors
+
+Listar todos los doctores registrados. Usado para el selector de doctor al agendar citas.
+
+**Response 200:**
+```json
+[
+  {
+    "id": 3,
+    "fullName": "Carlos Garcia",
+    "email": "doctor.garcia@medicerca.com"
+  },
+  {
+    "id": 4,
+    "fullName": "Ana Martinez",
+    "email": "doctor.martinez@medicerca.com"
+  }
+]
+```
+
+---
+
 ## Appointments [AUTH]
 
 ### POST /api/appointments
@@ -89,9 +113,17 @@ Agendar una cita.
 ```json
 {
   "type": "general",
-  "slotId": 1
+  "slotId": 1,
+  "doctor": "Carlos Garcia",
+  "clinic": "Centro Medico MediCerca",
+  "doctorId": 3,
+  "date": "2026-07-14",
+  "time": "10:00"
 }
 ```
+
+Campos requeridos: `type`, `slotId`, `doctor`, `clinic`.
+Campos opcionales: `doctorId` (id del doctor), `date`, `time`.
 
 Valores validos para `type`: `"general"`, `"followup"`, `"emergency"`.
 
@@ -104,7 +136,7 @@ Valores validos para `type`: `"general"`, `"followup"`, `"emergency"`.
 
 ### GET /api/appointments
 
-Listar todas las citas del usuario autenticado.
+Listar todas las citas del usuario autenticado (paciente).
 
 **Response 200:**
 ```json
@@ -113,11 +145,40 @@ Listar todas las citas del usuario autenticado.
     "id": 1,
     "type": "general",
     "slot_id": 1,
-    "doctor": "Dra. Adriana Solis",
-    "clinic": "Centro Medico Norte, Sala 3",
+    "doctor": "Carlos Garcia",
+    "clinic": "Centro Medico MediCerca",
     "date": "2026-07-14",
     "time": "10:00",
-    "confirmed_at": "2026-07-13T10:30:00Z"
+    "confirmed_at": "2026-07-13T10:30:00Z",
+    "doctor_id": 3
+  }
+]
+```
+
+---
+
+### GET /api/appointments/doctor
+
+Listar todas las citas asignadas al doctor autenticado. Solo doctores.
+
+Para citas creadas antes de agregar la columna `doctor_id`, el backend tambien busca por nombre del doctor en el campo `doctor` (texto).
+
+**Response 200:**
+```json
+[
+  {
+    "id": 1,
+    "type": "general",
+    "slot_id": 1,
+    "doctor": "Carlos Garcia",
+    "clinic": "Centro Medico MediCerca",
+    "date": "2026-07-14",
+    "time": "10:00",
+    "confirmed_at": "2026-07-13T10:30:00Z",
+    "user_id": 5,
+    "doctor_id": 3,
+    "patient_name": "Maria Lopez",
+    "patient_email": "maria@test.com"
   }
 ]
 ```
@@ -126,7 +187,7 @@ Listar todas las citas del usuario autenticado.
 
 ### DELETE /api/appointments/:id
 
-Eliminar una cita.
+Eliminar una cita. Puede ser eliminada tanto por el paciente (owner) como por el doctor asignado.
 
 **Response 200:**
 ```json
@@ -134,7 +195,7 @@ Eliminar una cita.
 ```
 
 **Errores:**
-- `404` — Cita no encontrada
+- `404` — Cita no encontrada o sin permisos
 
 ---
 
@@ -152,7 +213,8 @@ Listar recetas del usuario autenticado.
     "medication": "Losartan 50 mg",
     "frequency": "1 vez al dia",
     "refills": 2,
-    "date": "2026-06-10"
+    "date": "2026-06-10",
+    "doctor_name": "Carlos Garcia"
   }
 ]
 ```
@@ -172,7 +234,8 @@ Listar recetas creadas por el doctor autenticado. Solo doctores.
     "frequency": "Cada 8 horas",
     "refills": 3,
     "date": "2026-07-13",
-    "patientName": "Maria Lopez"
+    "user_id": 5,
+    "patient_name": "Maria Lopez"
   }
 ]
 ```
@@ -181,7 +244,9 @@ Listar recetas creadas por el doctor autenticado. Solo doctores.
 
 ### GET /api/prescriptions/patients
 
-Listar pacientes unicos del doctor autenticado (derivado de sus recetas). Solo doctores.
+Listar pacientes unicos del doctor autenticado. Solo doctores.
+
+Primero busca pacientes que tengan al menos una cita con el doctor. Si no hay ninguno, muestra todos los pacientes registrados.
 
 **Response 200:**
 ```json
@@ -299,11 +364,23 @@ curl -X POST https://medicerca-backend.onrender.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"demo@medicerca.com","password":"demo123"}'
 
-# Agendar cita (usar token del login)
+# Listar doctores
+curl https://medicerca-backend.onrender.com/api/doctors \
+  -H "Authorization: Bearer <token>"
+
+# Agendar cita con doctor especifico
 curl -X POST https://medicerca-backend.onrender.com/api/appointments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{"type":"general","slotId":1}'
+  -d '{"type":"general","slotId":1,"doctor":"Dr. Demo","clinic":"Centro Medico","doctorId":3,"date":"2026-07-14","time":"10:00"}'
+
+# Ver citas del doctor
+curl https://medicerca-backend.onrender.com/api/appointments/doctor \
+  -H "Authorization: Bearer <token>"
+
+# Eliminar una cita (paciente o doctor)
+curl -X DELETE https://medicerca-backend.onrender.com/api/appointments/1 \
+  -H "Authorization: Bearer <token>"
 
 # Crear receta (doctor)
 curl -X POST https://medicerca-backend.onrender.com/api/prescriptions \
@@ -311,7 +388,7 @@ curl -X POST https://medicerca-backend.onrender.com/api/prescriptions \
   -H "Authorization: Bearer <token>" \
   -d '{"patientId":5,"medication":"Ibuprofeno 400mg","frequency":"Cada 8 horas","refills":3}'
 
-# Ver pacientes del doctor
+# Ver pacientes del doctor (filtrados por citas)
 curl https://medicerca-backend.onrender.com/api/prescriptions/patients \
   -H "Authorization: Bearer <token>"
 ```

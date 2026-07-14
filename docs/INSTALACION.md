@@ -64,6 +64,22 @@ curl -X POST https://medicerca-backend.onrender.com/api/auth/register \
   -d '{"email":"maria@test.com","password":"medicerca123","fullName":"Maria Lopez","role":"patient"}'
 ```
 
+### Endpoints del backend
+
+| Endpoint | Metodo | Descripcion |
+|---|---|---|
+| `/api/health` | GET | Health check |
+| `/api/auth/register` | POST | Registrar usuario |
+| `/api/auth/login` | POST | Iniciar sesion |
+| `/api/doctors` | GET | Listar doctores (requiere auth) |
+| `/api/appointments` | GET/POST | Listar/crear citas del paciente |
+| `/api/appointments/doctor` | GET | Citas asignadas al doctor |
+| `/api/appointments/:id` | DELETE | Eliminar cita (paciente o doctor) |
+| `/api/prescriptions` | GET/POST | Listar/crear recetas |
+| `/api/prescriptions/created` | GET | Recetas creadas por el doctor |
+| `/api/prescriptions/patients` | GET | Pacientes con citas del doctor |
+| `/api/home-services` | GET/POST | Listar/crear servicios a domicilio |
+
 ## 3. Construir el APK de Android
 
 ### Configurar entorno
@@ -180,3 +196,5 @@ git push origin main --force
 | Flutter build falla | Verificar `flutter doctor` y Java 21 |
 | `INTERNET` permission error | Verificar `android/app/src/main/AndroidManifest.xml` tiene `<uses-permission android:name="android.permission.INTERNET"/>` |
 | APK muy grande (~50MB) | Normal para Flutter release con R8 minification |
+| Bottom overflow en bottom sheet | Usar DraggableScrollableSheet en vez de Column fija |
+| Citas no se ven en doctor | Verificar que doctor_id esta guardado en la cita |
