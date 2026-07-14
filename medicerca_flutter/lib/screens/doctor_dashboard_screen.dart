@@ -2,11 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../config/constants.dart';
+import '../config/models.dart';
 import '../providers/app_state.dart';
 import 'crear_receta_screen.dart';
 
-class DoctorDashboardScreen extends StatelessWidget {
+class DoctorDashboardScreen extends StatefulWidget {
   const DoctorDashboardScreen({super.key});
+
+  @override
+  State<DoctorDashboardScreen> createState() => _DoctorDashboardScreenState();
+}
+
+class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
+  List<Patient> _patients = [];
+  List<Prescription> _prescriptions = [];
+  List<Appointment> _appointments = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final appState = context.read<AppState>();
+      final results = await Future.wait([
+        appState.api.getPatients(),
+        appState.api.getCreatedPrescriptions(),
+        appState.api.getAppointments(),
+      ]);
+      if (mounted) {
+        setState(() {
+          _patients = results[0] as List<Patient>;
+          _prescriptions = results[1] as List<Prescription>;
+          _appointments = results[2] as List<Appointment>;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,50 +164,88 @@ class DoctorDashboardScreen extends StatelessWidget {
               children: [
                 Expanded(
                     child: _DoctorStat(
-                        value: '28', label: 'Pacientes', color: AppColors.primary)),
+                        value: '${_patients.length}', label: 'Pacientes', color: AppColors.primary)),
                 const SizedBox(width: 10),
                 Expanded(
                     child: _DoctorStat(
-                        value: '15', label: 'Recetas', color: AppColors.success)),
+                        value: '${_prescriptions.length}', label: 'Recetas', color: AppColors.success)),
                 const SizedBox(width: 10),
                 Expanded(
                     child: _DoctorStat(
-                        value: '6', label: 'Citas hoy', color: AppColors.warning)),
+                        value: '${_appointments.length}', label: 'Citas', color: AppColors.warning)),
               ],
             ),
             const SizedBox(height: 20),
-            Text(
-              'Actividad reciente',
-              style: GoogleFonts.dmSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+            if (_appointments.isNotEmpty) ...[
+              Text(
+                'Citas recientes',
+                style: GoogleFonts.dmSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            _ActivityItem(
-              icon: Icons.person_add,
-              color: AppColors.primary,
-              title: 'Nuevo paciente registrado',
-              subtitle: 'Maria Lopez',
-              time: 'Hoy',
-            ),
-            const SizedBox(height: 8),
-            _ActivityItem(
-              icon: Icons.receipt,
-              color: AppColors.success,
-              title: 'Receta emitida',
-              subtitle: 'Paracetamol 500mg - Juan Perez',
-              time: 'Ayer',
-            ),
-            const SizedBox(height: 8),
-            _ActivityItem(
-              icon: Icons.event_available,
-              color: AppColors.warning,
-              title: 'Cita completada',
-              subtitle: 'Seguimiento - Ana Garcia',
-              time: 'Hace 2 dias',
-            ),
+              const SizedBox(height: 12),
+              ..._appointments.take(3).map((a) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _ActivityItem(
+                      icon: Icons.event,
+                      color: AppColors.primary,
+                      title: a.typeDisplay,
+                      subtitle: a.doctor ?? a.clinic ?? '',
+                      time: a.date ?? '',
+                    ),
+                  )),
+            ],
+            if (_patients.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Pacientes recientes',
+                style: GoogleFonts.dmSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ..._patients.take(3).map((p) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _ActivityItem(
+                      icon: Icons.person,
+                      color: AppColors.success,
+                      title: p.fullName,
+                      subtitle: p.email,
+                      time: '',
+                    ),
+                  )),
+            ],
+            if (!_loading && _patients.isEmpty && _appointments.isEmpty) ...[
+              const SizedBox(height: 40),
+              Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.medical_services_outlined, size: 48, color: AppColors.textTertiary),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Bienvenido Dr. ${user?.fullName.split(' ').first ?? ''}',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Crea una receta o revisa tus pacientes',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -316,11 +392,12 @@ class _ActivityItem extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            time,
-            style:
-                GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
-          ),
+          if (time.isNotEmpty)
+            Text(
+              time,
+              style:
+                  GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
+            ),
         ],
       ),
     );

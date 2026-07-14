@@ -2,11 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../config/constants.dart';
+import '../config/models.dart';
 import '../providers/app_state.dart';
 import 'soporte_screen.dart';
 
-class InicioScreen extends StatelessWidget {
+class InicioScreen extends StatefulWidget {
   const InicioScreen({super.key});
+
+  @override
+  State<InicioScreen> createState() => _InicioScreenState();
+}
+
+class _InicioScreenState extends State<InicioScreen> {
+  List<Appointment> _appointments = [];
+  List<Prescription> _prescriptions = [];
+  List<HomeService> _services = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final appState = context.read<AppState>();
+      final results = await Future.wait([
+        appState.api.getAppointments(),
+        appState.api.getPrescriptions(),
+        appState.api.getHomeServices(),
+      ]);
+      if (mounted) {
+        setState(() {
+          _appointments = results[0] as List<Appointment>;
+          _prescriptions = results[1] as List<Prescription>;
+          _services = results[2] as List<HomeService>;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +53,9 @@ class InicioScreen extends StatelessWidget {
     final hour = DateTime.now().hour;
     final greeting =
         hour < 12 ? 'Buenos dias' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
+
+    final nextAppointment =
+        _appointments.isNotEmpty ? _appointments.first : null;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -112,130 +153,190 @@ class InicioScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(30),
-                          borderRadius: BorderRadius.circular(8),
+            if (nextAppointment != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(30),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.event, color: Colors.white, size: 18),
                         ),
-                        child: const Icon(Icons.event, color: Colors.white, size: 18),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Proxima cita',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                        const SizedBox(width: 10),
+                        Text(
+                          'Proxima cita',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Consulta General',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time, color: Colors.white70, size: 14),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Manana, 10:00 AM',
-                        style: GoogleFonts.dmSans(fontSize: 12, color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 36,
-                    child: ElevatedButton(
-                      onPressed: () => appState.switchTab(1),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: Text(
-                        'Ver detalles',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    const SizedBox(height: 12),
+                    Text(
+                      nextAppointment.typeDisplay,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time, color: Colors.white70, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          nextAppointment.date ?? 'Sin fecha',
+                          style: GoogleFonts.dmSans(fontSize: 12, color: Colors.white70),
+                        ),
+                        if (nextAppointment.time != null) ...[
+                          const SizedBox(width: 8),
+                          const Icon(Icons.schedule, color: Colors.white70, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            nextAppointment.time!,
+                            style: GoogleFonts.dmSans(fontSize: 12, color: Colors.white70),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 36,
+                      child: ElevatedButton(
+                        onPressed: () => appState.switchTab(1),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: Text(
+                          'Ver detalles',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
-                  child: _StatCard(value: '12', label: 'Visitas', color: AppColors.primary),
+                  child: _StatCard(
+                    value: '${_appointments.length}',
+                    label: 'Citas',
+                    color: AppColors.primary,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _StatCard(value: '3', label: 'Recetas', color: AppColors.success),
+                  child: _StatCard(
+                    value: '${_prescriptions.length}',
+                    label: 'Recetas',
+                    color: AppColors.success,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _StatCard(value: '5', label: 'Servicios', color: AppColors.warning),
+                  child: _StatCard(
+                    value: '${_services.length}',
+                    label: 'Servicios',
+                    color: AppColors.warning,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            Text(
-              'Actividad reciente',
-              style: GoogleFonts.dmSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+            if (_appointments.isNotEmpty) ...[
+              Text(
+                'Mis citas',
+                style: GoogleFonts.dmSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            _ActivityTile(
-              icon: Icons.check_circle,
-              color: AppColors.success,
-              title: 'Cita completada',
-              subtitle: 'Consulta General - Dr. Garcia',
-              time: 'Hace 2 dias',
-            ),
-            const SizedBox(height: 8),
-            _ActivityTile(
-              icon: Icons.receipt,
-              color: AppColors.primary,
-              title: 'Receta recibida',
-              subtitle: 'Ibuprofeno 400mg',
-              time: 'Hace 5 dias',
-            ),
-            const SizedBox(height: 8),
-            _ActivityTile(
-              icon: Icons.home_repair_service,
-              color: AppColors.warning,
-              title: 'Servicio domicilio',
-              subtitle: 'Enfermeria a domicilio',
-              time: 'Hace 1 semana',
-            ),
+              const SizedBox(height: 12),
+              ..._appointments.take(3).map((a) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _ActivityTile(
+                      icon: Icons.event,
+                      color: AppColors.primary,
+                      title: a.typeDisplay,
+                      subtitle: a.doctor ?? 'Sin doctor asignado',
+                      time: a.date ?? '',
+                    ),
+                  )),
+              const SizedBox(height: 12),
+            ],
+            if (_prescriptions.isNotEmpty) ...[
+              Text(
+                'Mis recetas',
+                style: GoogleFonts.dmSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ..._prescriptions.take(3).map((p) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _ActivityTile(
+                      icon: Icons.receipt,
+                      color: AppColors.success,
+                      title: p.medication,
+                      subtitle: p.frequency ?? '',
+                      time: p.date,
+                    ),
+                  )),
+            ],
+            if (!_loading && _appointments.isEmpty && _prescriptions.isEmpty) ...[
+              const SizedBox(height: 40),
+              Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.home_outlined, size: 48, color: AppColors.textTertiary),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Bienvenido a MediCerca',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Usa los botones de arriba para navegar',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -376,10 +477,11 @@ class _ActivityTile extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            time,
-            style: GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
-          ),
+          if (time.isNotEmpty)
+            Text(
+              time,
+              style: GoogleFonts.dmSans(fontSize: 10, color: AppColors.textTertiary),
+            ),
         ],
       ),
     );
