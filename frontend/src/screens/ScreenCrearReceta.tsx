@@ -55,7 +55,7 @@ export function ScreenCrearReceta({
           <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8" style={{ background: "#D1FAE5", boxShadow: "0 8px 32px rgba(5,150,105,0.15)" }}>
             <Check size={36} strokeWidth={3} color="#059669" />
           </div>
-          <h2 className="mb-3" style={{ color: "#0F172A", fontFamily: "'Lora', serif", fontSize: 32, fontWeight: 700 }}>
+          <h2 className="mb-3" style={{ color: "#1E293B", fontFamily: "'Lora', serif", fontSize: 32, fontWeight: 700 }}>
             Receta creada
           </h2>
           <p className="mb-10" style={{ color: "#64748B", fontSize: 16 }}>
@@ -65,7 +65,7 @@ export function ScreenCrearReceta({
             <button
               onClick={() => { setSuccess(false); setMedication(""); setFrequency(""); setRefills(0); setSelectedPatient(null); }}
               className="px-6 rounded-xl font-semibold text-[15px] flex items-center gap-2 cursor-pointer"
-              style={{ height: 48, background: "#0F766E", color: "#fff" }}
+              style={{ height: 48, background: "#0369A1", color: "#fff" }}
             >
               <FileText size={16} />
               Otra receta
@@ -73,7 +73,7 @@ export function ScreenCrearReceta({
             <button
               onClick={() => onNavigate("inicio")}
               className="px-6 rounded-xl font-semibold text-[15px] flex items-center gap-2 cursor-pointer"
-              style={{ height: 48, background: "#F1F5F9", color: "#0F172A", border: "1px solid #E2E8F0" }}
+              style={{ height: 48, background: "#F1F5F9", color: "#1E293B", border: "1px solid #E2E8F0" }}
             >
               Volver al dashboard
             </button>
@@ -83,10 +83,10 @@ export function ScreenCrearReceta({
     );
   }
 
-  const inputStyle = { height: 52, background: "#F8FAFC", borderColor: "#E2E8F0", color: "#0F172A" };
+  const inputStyle = { height: 52, background: "#F8FAFC", borderColor: "#E2E8F0", color: "#1E293B" };
   const focusIn = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = "#14B8A6";
-    e.currentTarget.style.boxShadow = "0 0 0 3px #CCFBF1";
+    e.currentTarget.style.borderColor = "#0EA5E9";
+    e.currentTarget.style.boxShadow = "0 0 0 3px #E0F2FE";
     e.currentTarget.style.background = "#fff";
   };
   const focusOut = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -99,12 +99,12 @@ export function ScreenCrearReceta({
     <div className="px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-10 max-w-4xl mx-auto">
       {/* Breadcrumb */}
       <div className="hidden sm:flex items-center gap-2 text-sm mb-6" style={{ color: "#64748B" }}>
-        <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: "#0F766E" }}>Dashboard</button>
+        <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: "#0369A1" }}>Dashboard</button>
         <span>/</span>
-        <span style={{ color: "#0F172A" }}>Crear receta</span>
+        <span style={{ color: "#1E293B" }}>Crear receta</span>
       </div>
 
-      <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: "#0F172A", fontFamily: "'Lora', serif" }}>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: "#1E293B", fontFamily: "'Lora', serif" }}>
         Crear receta medica
       </h1>
       <p className="text-sm sm:text-base mb-6 sm:mb-10" style={{ color: "#64748B" }}>
@@ -115,10 +115,10 @@ export function ScreenCrearReceta({
         <div className="space-y-5 mb-7">
           {/* Patient select */}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: "#0F172A" }}>Paciente</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "#1E293B" }}>Paciente</label>
             {patientsLoading ? (
               <div className="flex items-center gap-2 text-sm" style={{ color: "#94A3B8", height: 52 }}>
-                <div className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#0F766E" }} />
+                <div className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#0369A1" }} />
                 Cargando pacientes...
               </div>
             ) : (
@@ -140,7 +140,7 @@ export function ScreenCrearReceta({
 
           {/* Medication */}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: "#0F172A" }}>Medicamento</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "#1E293B" }}>Medicamento</label>
             <input
               type="text"
               value={medication}
@@ -155,7 +155,7 @@ export function ScreenCrearReceta({
 
           {/* Frequency */}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: "#0F172A" }}>Frecuencia</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "#1E293B" }}>Frecuencia</label>
             <input
               type="text"
               value={frequency}
@@ -170,7 +170,7 @@ export function ScreenCrearReceta({
 
           {/* Refills */}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: "#0F172A" }}>Repeticiones</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: "#1E293B" }}>Repeticiones</label>
             <input
               type="number"
               min={0}

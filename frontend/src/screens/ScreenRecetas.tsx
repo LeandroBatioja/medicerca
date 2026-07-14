@@ -33,14 +33,14 @@ export function ScreenRecetas({
   return (
     <div className="px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-10 max-w-4xl mx-auto">
       <div className="hidden sm:flex items-center gap-2 text-sm mb-6" style={{ color: "#64748B" }}>
-        <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: "#0F766E" }}>Dashboard</button>
+        <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: "#0369A1" }}>Dashboard</button>
         <span>/</span>
-        <span style={{ color: "#0F172A" }}>Recetas</span>
+        <span style={{ color: "#1E293B" }}>Recetas</span>
       </div>
 
       <div className="flex items-start sm:items-center justify-between mb-6 sm:mb-10">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: "#0F172A", fontFamily: "'Lora', serif" }}>
+          <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: "#1E293B", fontFamily: "'Lora', serif" }}>
             {isDoctor ? "Recetas creadas" : "Mis recetas"}
           </h1>
           <p className="text-sm sm:text-base" style={{ color: "#64748B" }}>
@@ -63,7 +63,7 @@ export function ScreenRecetas({
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="flex items-center gap-3 px-6 py-4 rounded-xl" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-            <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#0F766E" }} />
+            <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#0369A1" }} />
             <span className="text-sm font-medium" style={{ color: "#64748B" }}>Cargando recetas...</span>
           </div>
         </div>
@@ -74,10 +74,10 @@ export function ScreenRecetas({
         </div>
       ) : prescriptions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 sm:py-20 rounded-2xl border" style={{ background: "#FFFFFF", borderColor: "#E2E8F0" }}>
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 sm:mb-4" style={{ background: "#CCFBF1" }}>
-            <FileText size={24} color="#0F766E" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-3 sm:mb-4" style={{ background: "#E0F2FE" }}>
+            <FileText size={24} color="#0369A1" />
           </div>
-          <p className="text-base sm:text-lg font-semibold mb-1" style={{ color: "#0F172A" }}>
+          <p className="text-base sm:text-lg font-semibold mb-1" style={{ color: "#1E293B" }}>
             {isDoctor ? "Sin recetas creadas" : "Sin recetas registradas"}
           </p>
           <p className="text-xs sm:text-sm mb-5 sm:mb-6 text-center px-4" style={{ color: "#64748B" }}>
@@ -105,7 +105,7 @@ export function ScreenRecetas({
               >
                 {isDoctor && (
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: "#CCFBF1", color: "#0F766E" }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: "#E0F2FE", color: "#0369A1" }}>
                       {(rx.patient_name || "P").charAt(0)}
                     </div>
                     <span className="text-xs font-medium" style={{ color: "#64748B" }}>{rx.patient_name}</span>
@@ -115,12 +115,12 @@ export function ScreenRecetas({
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EDE9FE" }}>
                     <Pill size={14} color="#7C3AED" />
                   </div>
-                  <span className="text-sm font-semibold" style={{ color: "#0F172A" }}>{rx.medication}</span>
+                  <span className="text-sm font-semibold" style={{ color: "#1E293B" }}>{rx.medication}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs" style={{ color: "#64748B" }}>{rx.frequency}</span>
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "#CCFBF1", color: "#0F766E" }}>
+                    <span className="inline-flex text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "#E0F2FE", color: "#0369A1" }}>
                       {rx.refills}x
                     </span>
                     <span className="text-[10px]" style={{ color: "#94A3B8" }}>{rx.date}</span>
@@ -161,21 +161,21 @@ export function ScreenRecetas({
               >
                 {isDoctor && (
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: "#CCFBF1", color: "#0F766E" }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: "#E0F2FE", color: "#0369A1" }}>
                       {(rx.patient_name || "P").charAt(0)}
                     </div>
-                    <span className="text-sm font-medium truncate" style={{ color: "#0F172A" }}>{rx.patient_name}</span>
+                    <span className="text-sm font-medium truncate" style={{ color: "#1E293B" }}>{rx.patient_name}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EDE9FE" }}>
                     <Pill size={14} color="#7C3AED" />
                   </div>
-                  <span className="text-sm font-semibold" style={{ color: "#0F172A" }}>{rx.medication}</span>
+                  <span className="text-sm font-semibold" style={{ color: "#1E293B" }}>{rx.medication}</span>
                 </div>
                 <div className="text-sm" style={{ color: "#64748B" }}>{rx.frequency}</div>
                 <div>
-                  <span className="inline-flex text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#CCFBF1", color: "#0F766E" }}>
+                  <span className="inline-flex text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#E0F2FE", color: "#0369A1" }}>
                     {rx.refills}x
                   </span>
                 </div>

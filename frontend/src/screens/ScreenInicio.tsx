@@ -5,73 +5,35 @@ import {
   Headphones,
   ArrowRight,
   Clock,
-  Sun,
-  Moon,
-  Sunset,
-  TrendingUp,
-  FileText,
+  Bell,
+  Activity,
 } from "lucide-react";
 import { type Screen } from "../types";
 
 function getGreeting() {
   const h = new Date().getHours();
-  if (h < 12) return { text: "Buenos dias", icon: Sun };
-  if (h < 19) return { text: "Buenas tardes", icon: Sunset };
-  return { text: "Buenas noches", icon: Moon };
+  if (h < 12) return "Buenos dias";
+  if (h < 19) return "Buenas tardes";
+  return "Buenas noches";
 }
-
-function getFormattedDate() {
-  return new Date().toLocaleDateString("es-ES", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-const stats = [
-  { label: "Citas este mes", value: "3", change: "+1 vs mes anterior", icon: CalendarCheck, color: "#0F766E", bg: "#CCFBF1" },
-  { label: "Recetas activas", value: "2", change: "1 proxima a vencer", icon: FileText, color: "#7C3AED", bg: "#EDE9FE" },
-  { label: "Servicios domicilio", value: "0", change: "Sin pendientes", icon: Ambulance, color: "#0284C7", bg: "#E0F2FE" },
-];
 
 const quickActions = [
-  {
-    id: "form-step1" as Screen,
-    label: "Agendar cita",
-    desc: "Reserva tu proxima consulta medica de forma rapida y sencilla",
-    icon: CalendarCheck,
-    color: "#0F766E",
-    bg: "#CCFBF1",
-    featured: true,
-  },
-  {
-    id: "recetas" as Screen,
-    label: "Mis recetas",
-    desc: "Consulta tus recetas medicas digitales",
-    icon: Pill,
-    color: "#7C3AED",
-    bg: "#EDE9FE",
-    featured: false,
-  },
-  {
-    id: "asistencia" as Screen,
-    label: "Servicios a domicilio",
-    desc: "Accede a servicios medicos en tu hogar",
-    icon: Ambulance,
-    color: "#0284C7",
-    bg: "#E0F2FE",
-    featured: false,
-  },
-  {
-    id: "soporte" as Screen,
-    label: "Centro de soporte",
-    desc: "Resuelve tus dudas frecuentes",
-    icon: Headphones,
-    color: "#D97706",
-    bg: "#FEF3C7",
-    featured: false,
-  },
+  { id: "form-step1" as Screen, label: "Agendar", icon: CalendarCheck, color: "#0369A1", bg: "#E0F2FE" },
+  { id: "recetas" as Screen, label: "Recetas", icon: Pill, color: "#7C3AED", bg: "#EDE9FE" },
+  { id: "asistencia" as Screen, label: "Servicios", icon: Ambulance, color: "#0284C7", bg: "#E0F2FE" },
+  { id: "soporte" as Screen, label: "Soporte", icon: Headphones, color: "#D97706", bg: "#FEF3C7" },
+];
+
+const stats = [
+  { label: "Citas", value: "3", sub: "este mes", color: "#0369A1", bg: "#E0F2FE" },
+  { label: "Recetas", value: "2", sub: "activas", color: "#7C3AED", bg: "#EDE9FE" },
+  { label: "Servicios", value: "0", sub: "pendientes", color: "#0284C7", bg: "#E0F2FE" },
+];
+
+const activity = [
+  { text: "Cita agendada - Consulta general", time: "Hace 2 dias", color: "#0369A1" },
+  { text: "Receta recibida - Ibuprofeno 400mg", time: "Hace 5 dias", color: "#7C3AED" },
+  { text: "Sesion iniciada", time: "Hoy, 09:15", color: "#64748B" },
 ];
 
 export function ScreenInicio({
@@ -81,153 +43,124 @@ export function ScreenInicio({
   onNavigate: (s: Screen) => void;
   userName: string;
 }) {
-  const greeting = getGreeting();
-  const GreetingIcon = greeting.icon;
-  const featured = quickActions.find((a) => a.featured)!;
-  const others = quickActions.filter((a) => !a.featured);
-
   return (
-    <div className="min-h-screen" style={{ background: "#F8FAFC" }}>
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-8 sm:py-12 lg:px-12 lg:py-12">
+    <div className="min-h-screen" style={{ background: "#F1F5F9" }}>
+      <div className="max-w-lg mx-auto px-4 py-5">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-14">
-          <div>
-            <div className="flex items-center gap-2 mb-2 sm:mb-3">
-              <GreetingIcon size={18} color="#D97706" />
-              <p className="text-xs sm:text-sm font-medium" style={{ color: "#64748B" }}>
-                {greeting.text}
-              </p>
-            </div>
-            <h1
-              className="mb-1 sm:mb-2"
-              style={{ color: "#0F172A", fontFamily: "'Lora', serif", fontSize: window.innerWidth < 640 ? 28 : 36, fontWeight: 700 }}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+              style={{ background: "#E0F2FE", color: "#0369A1" }}
             >
-              Hola, {userName}
-            </h1>
-            <p className="text-sm sm:text-base" style={{ color: "#94A3B8" }}>
-              {getFormattedDate()}
-            </p>
+              {userName.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-[11px] font-medium" style={{ color: "#64748B" }}>{getGreeting()}</p>
+              <p className="text-sm font-bold" style={{ color: "#1E293B" }}>{userName}</p>
+            </div>
           </div>
-
           <button
-            onClick={() => onNavigate("form-step1")}
-            className="mt-6 sm:mt-0 h-12 px-6 rounded-xl font-semibold text-[15px] flex items-center gap-2 transition-all duration-200 cursor-pointer shrink-0"
-            style={{ background: "#0F766E", color: "#fff", boxShadow: "0 4px 12px rgba(15,118,110,0.25)" }}
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{ background: "#E0F2FE" }}
           >
-            <CalendarCheck size={18} />
-            Nueva cita
+            <Bell size={16} color="#0369A1" />
           </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 mb-8 sm:mb-14">
-          {stats.map((s) => (
-            <div
-              key={s.label}
-              className="p-4 sm:p-6 rounded-2xl border transition-all duration-200"
-              style={{ background: "#FFFFFF", borderColor: "#E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-            >
-              <div className="flex items-center justify-between mb-3 sm:mb-5">
-                <div
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center"
-                  style={{ background: s.bg }}
-                >
-                  <s.icon size={20} color={s.color} />
-                </div>
-                <TrendingUp size={14} color="#94A3B8" />
-              </div>
-              <p
-                style={{ color: "#0F172A", fontSize: window.innerWidth < 640 ? 24 : 32, fontWeight: 700, lineHeight: 1 }}
-                className="mb-1"
-              >
-                {s.value}
-              </p>
-              <p className="text-xs sm:text-sm font-medium mb-0.5 sm:mb-1" style={{ color: "#0F172A" }}>{s.label}</p>
-              <p className="text-[10px] sm:text-xs" style={{ color: "#94A3B8" }}>{s.change}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Featured action */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-5" style={{ color: "#0F172A" }}>
-            Acciones rapidas
-          </h2>
-          <button
-            onClick={() => onNavigate(featured.id)}
-            className="w-full flex items-center gap-4 sm:gap-6 p-5 sm:p-7 rounded-2xl border text-left transition-all duration-200 cursor-pointer group"
-            style={{
-              background: "linear-gradient(135deg, #CCFBF1 0%, #E0F2FE 100%)",
-              borderColor: "#B2DFDB",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(15,118,110,0.12)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "none"; }}
-          >
-            <div
-              className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0"
-              style={{ background: "#0F766E", boxShadow: "0 4px 12px rgba(15,118,110,0.3)" }}
-            >
-              <featured.icon size={window.innerWidth < 640 ? 22 : 28} color="#fff" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-base sm:text-lg font-bold mb-0.5 sm:mb-1" style={{ color: "#0F172A" }}>{featured.label}</p>
-              <p className="text-xs sm:text-sm" style={{ color: "#64748B" }}>{featured.desc}</p>
-            </div>
-            <ArrowRight size={20} color="#0F766E" className="shrink-0 transition-transform group-hover:translate-x-1" />
-          </button>
-        </div>
-
-        {/* Other actions grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mb-8 sm:mb-12">
-          {others.map((a) => (
+        {/* Quick actions row */}
+        <div className="grid grid-cols-4 gap-2 mb-5">
+          {quickActions.map((a) => (
             <button
               key={a.id}
               onClick={() => onNavigate(a.id)}
-              className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-4 p-4 sm:p-6 rounded-2xl border text-left transition-all duration-200 cursor-pointer group"
-              style={{ background: "#FFFFFF", borderColor: "#E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "none"; }}
+              className="flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all duration-150 cursor-pointer"
+              style={{ background: "#FFFFFF", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
             >
               <div
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0"
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
                 style={{ background: a.bg }}
               >
-                <a.icon size={18} color={a.color} />
+                <a.icon size={16} color={a.color} />
               </div>
-              <div>
-                <p className="text-sm sm:text-[15px] font-semibold mb-0.5 sm:mb-1" style={{ color: "#0F172A" }}>{a.label}</p>
-                <p className="text-xs sm:text-sm leading-relaxed" style={{ color: "#64748B" }}>{a.desc}</p>
-              </div>
+              <span className="text-[10px] font-semibold" style={{ color: "#64748B" }}>{a.label}</span>
             </button>
           ))}
         </div>
 
-        {/* Activity section */}
+        {/* Upcoming appointment */}
         <div
-          className="p-4 sm:p-6 rounded-2xl border"
-          style={{ background: "#FFFFFF", borderColor: "#E2E8F0" }}
+          className="p-4 rounded-xl mb-5"
+          style={{
+            background: "linear-gradient(135deg, #0369A1 0%, #075985 100%)",
+            boxShadow: "0 4px 12px rgba(3,105,161,0.25)",
+          }}
         >
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <Clock size={16} color="#64748B" />
-            <h3 className="text-sm sm:text-base font-bold" style={{ color: "#0F172A" }}>Actividad reciente</h3>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.7)" }}>
+              Proxima cita
+            </span>
+            <CalendarCheck size={14} color="rgba(255,255,255,0.7)" />
           </div>
-          <div className="space-y-3">
-            {[
-              { text: "Cita agendada - Consulta general", time: "Hace 2 dias", color: "#0F766E" },
-              { text: "Receta recibida - Ibuprofeno 400mg", time: "Hace 5 dias", color: "#7C3AED" },
-              { text: "Sesion iniciada desde navegador web", time: "Hoy, 09:15", color: "#64748B" },
-            ].map((a, i) => (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: "rgba(255,255,255,0.2)", color: "#fff" }}>
+              DL
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold" style={{ color: "#fff" }}>Dr. Carlos Mendoza</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>Consulta general</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-semibold" style={{ color: "#fff" }}>15 Jul</p>
+              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.7)" }}>10:30 AM</p>
+            </div>
+          </div>
+          <button
+            onClick={() => onNavigate("form-step1")}
+            className="w-full mt-3 h-8 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+            style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}
+          >
+            Ver detalles <ArrowRight size={12} />
+          </button>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-2.5 mb-5">
+          {stats.map((s) => (
+            <div
+              key={s.label}
+              className="p-3.5 rounded-xl"
+              style={{ background: "#FFFFFF", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
+            >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{ background: s.bg }}>
+                <Activity size={14} color={s.color} />
+              </div>
+              <p className="text-xl font-bold" style={{ color: "#1E293B", lineHeight: 1 }}>{s.value}</p>
+              <p className="text-[10px] font-semibold mt-0.5" style={{ color: "#64748B" }}>{s.label}</p>
+              <p className="text-[9px]" style={{ color: "#94A3B8" }}>{s.sub}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Activity */}
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ background: "#FFFFFF", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
+        >
+          <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "#F1F5F9" }}>
+            <Clock size={14} color="#64748B" />
+            <span className="text-xs font-semibold" style={{ color: "#1E293B" }}>Actividad reciente</span>
+          </div>
+          <div>
+            {activity.map((a, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between py-3"
-                style={{ borderBottom: i < 2 ? "1px solid #F1F5F9" : "none" }}
+                className="flex items-center gap-3 px-4 py-3"
+                style={{ borderBottom: i < activity.length - 1 ? "1px solid #F1F5F9" : "none" }}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full" style={{ background: a.color }} />
-                  <span className="text-sm" style={{ color: "#0F172A" }}>{a.text}</span>
-                </div>
-                <span className="text-xs shrink-0 ml-4" style={{ color: "#94A3B8" }}>{a.time}</span>
+                <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: a.color }} />
+                <span className="text-xs flex-1 min-w-0 truncate" style={{ color: "#1E293B" }}>{a.text}</span>
+                <span className="text-[10px] shrink-0" style={{ color: "#94A3B8" }}>{a.time}</span>
               </div>
             ))}
           </div>

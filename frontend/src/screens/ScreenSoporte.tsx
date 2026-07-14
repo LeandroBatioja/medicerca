@@ -51,7 +51,7 @@ export function ScreenSoporte({
       {/* Hero card */}
       <div
         className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 rounded-2xl mb-6 sm:mb-8"
-        style={{ background: "linear-gradient(135deg, #CCFBF1 0%, #E0F2FE 100%)", border: `1px solid ${C.border}` }}
+        style={{ background: "linear-gradient(135deg, #E0F2FE 0%, #E0F2FE 100%)", border: `1px solid ${C.border}` }}
       >
         <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.7)" }}>
           <Headphones size={22} color={C.brand} />

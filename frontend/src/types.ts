@@ -53,22 +53,22 @@ export interface HomeService {
 }
 
 export const C = {
-  brand: "#0F766E",
-  brandLight: "#CCFBF1",
-  brandDark: "#115E59",
-  brandAccent: "#14B8A6",
+  brand: "#0369A1",
+  brandLight: "#E0F2FE",
+  brandDark: "#075985",
+  brandAccent: "#0EA5E9",
 
-  bg: "#F8FAFC",
+  bg: "#F1F5F9",
   surface: "#FFFFFF",
-  surfaceHover: "#F1F5F9",
+  surfaceHover: "#F8FAFC",
 
-  text: "#0F172A",
+  text: "#1E293B",
   textSecondary: "#64748B",
   textMuted: "#94A3B8",
   textInverse: "#FFFFFF",
 
   border: "#E2E8F0",
-  borderFocus: "#14B8A6",
+  borderFocus: "#0EA5E9",
 
   success: "#059669",
   successLight: "#D1FAE5",

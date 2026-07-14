@@ -46,7 +46,7 @@ export function MobileTabBar({
               className="flex-1 flex flex-col items-center justify-center gap-1 py-2 cursor-pointer transition-colors"
               style={{
                 background: "transparent",
-                color: active ? "#0F766E" : "#94A3B8",
+                color: active ? "#0369A1" : "#94A3B8",
                 WebkitTapHighlightColor: "transparent",
               }}
               aria-label={tab.label}

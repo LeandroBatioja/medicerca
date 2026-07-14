@@ -120,11 +120,11 @@ export function Sidebar({
 const C = {
   surface: "#FFFFFF",
   border: "#E2E8F0",
-  text: "#0F172A",
+  text: "#1E293B",
   textSecondary: "#64748B",
   textMuted: "#94A3B8",
-  brand: "#0F766E",
-  brandLight: "#CCFBF1",
+  brand: "#0369A1",
+  brandLight: "#E0F2FE",
   error: "#DC2626",
   errorLight: "#FEE2E2",
 } as const;
