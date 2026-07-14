@@ -10,7 +10,7 @@ import 'inicio_screen.dart';
 import 'doctor_dashboard_screen.dart';
 import 'recetas_screen.dart';
 import 'asistencia_screen.dart';
-import 'form_step1_screen.dart';
+import 'citas_screen.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key});
@@ -39,14 +39,14 @@ class _MainShellBodyState extends State<_MainShellBody> {
 
   List<Widget> get _patientScreens => const [
         InicioScreen(),
-        FormStep1Screen(),
+        CitasScreen(),
         RecetasScreen(),
         AsistenciaScreen(),
       ];
 
   List<Widget> get _doctorScreens => const [
         DoctorDashboardScreen(),
-        FormStep1Screen(),
+        CitasScreen(),
         RecetasScreen(),
         AsistenciaScreen(),
       ];

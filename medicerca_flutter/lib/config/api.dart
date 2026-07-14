@@ -21,15 +21,23 @@ class ApiClient {
         if (_token != null) 'Authorization': 'Bearer $_token',
       };
 
-  Future<Map<String, dynamic>> _handleResponse(http.Response response) async {
+  Future<dynamic> _handleResponse(http.Response response) async {
     final body = json.decode(response.body);
     if (response.statusCode >= 400) {
       throw ApiException(
-        body['error'] ?? body['message'] ?? 'Error del servidor',
+        body is Map ? (body['error'] ?? body['message'] ?? 'Error del servidor') : 'Error del servidor',
         statusCode: response.statusCode,
       );
     }
     return body;
+  }
+
+  List<dynamic> _extractList(dynamic body) {
+    if (body is List) return body;
+    if (body is Map) {
+      return body['prescriptions'] ?? body['appointments'] ?? body['patients'] ?? body['services'] ?? body['data'] ?? [];
+    }
+    return [];
   }
 
   Future<http.Response> _get(String path) async {
@@ -50,7 +58,9 @@ class ApiClient {
       'email': email,
       'password': password,
     });
-    return _handleResponse(res);
+    final body = await _handleResponse(res);
+    if (body is! Map<String, dynamic>) throw ApiException('Respuesta invalida');
+    return body;
   }
 
   Future<Map<String, dynamic>> register(String email, String password, String fullName, UserRole role) async {
@@ -60,15 +70,17 @@ class ApiClient {
       'fullName': fullName,
       'role': role == UserRole.doctor ? 'doctor' : 'patient',
     });
-    return _handleResponse(res);
+    final body = await _handleResponse(res);
+    if (body is! Map<String, dynamic>) throw ApiException('Respuesta invalida');
+    return body;
   }
 
   // Appointments
   Future<List<Appointment>> getAppointments() async {
     final res = await _get('/api/appointments');
     final body = await _handleResponse(res);
-    final list = body['appointments'] ?? body['data'] ?? [];
-    return (list as List).map((a) => Appointment.fromJson(a)).toList();
+    final list = _extractList(body);
+    return list.map((a) => Appointment.fromJson(a)).toList();
   }
 
   Future<Map<String, dynamic>> createAppointment(int slotId, String type) async {
@@ -76,29 +88,31 @@ class ApiClient {
       'slotId': slotId,
       'type': type,
     });
-    return _handleResponse(res);
+    final body = await _handleResponse(res);
+    if (body is! Map<String, dynamic>) throw ApiException('Respuesta invalida');
+    return body;
   }
 
   // Prescriptions
   Future<List<Prescription>> getPrescriptions() async {
     final res = await _get('/api/prescriptions');
     final body = await _handleResponse(res);
-    final list = body['prescriptions'] ?? body['data'] ?? [];
-    return (list as List).map((p) => Prescription.fromJson(p)).toList();
+    final list = _extractList(body);
+    return list.map((p) => Prescription.fromJson(p)).toList();
   }
 
   Future<List<Prescription>> getCreatedPrescriptions() async {
     final res = await _get('/api/prescriptions/created');
     final body = await _handleResponse(res);
-    final list = body['prescriptions'] ?? body['data'] ?? [];
-    return (list as List).map((p) => Prescription.fromJson(p)).toList();
+    final list = _extractList(body);
+    return list.map((p) => Prescription.fromJson(p)).toList();
   }
 
   Future<List<Patient>> getPatients() async {
     final res = await _get('/api/prescriptions/patients');
     final body = await _handleResponse(res);
-    final list = body['patients'] ?? body['data'] ?? [];
-    return (list as List).map((p) => Patient.fromJson(p)).toList();
+    final list = _extractList(body);
+    return list.map((p) => Patient.fromJson(p)).toList();
   }
 
   Future<Prescription> createPrescription({
@@ -114,14 +128,17 @@ class ApiClient {
       'refills': refills,
     });
     final body = await _handleResponse(res);
-    return Prescription.fromJson(body['prescription'] ?? body);
+    if (body is Map) {
+      return Prescription.fromJson(body['prescription'] ?? body);
+    }
+    throw ApiException('Respuesta invalida');
   }
 
   // Home services
   Future<List<HomeService>> getHomeServices() async {
     final res = await _get('/api/home-services');
     final body = await _handleResponse(res);
-    final list = body['services'] ?? body['data'] ?? [];
-    return (list as List).map((h) => HomeService.fromJson(h)).toList();
+    final list = _extractList(body);
+    return list.map((h) => HomeService.fromJson(h)).toList();
   }
 }
