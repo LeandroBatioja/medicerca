@@ -194,153 +194,160 @@ class _CitasScreenState extends State<CitasScreen> {
   void _showDetail(Appointment appointment) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              appointment.typeDisplay,
-              style: GoogleFonts.dmSans(
-                fontSize: AppFontSize.subtitle,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _DetailRow(
-                icon: Icons.person_outline,
-                label: 'Doctor',
-                value: appointment.doctor ?? 'No asignado'),
-            const SizedBox(height: 12),
-            _DetailRow(
-                icon: Icons.location_on_outlined,
-                label: 'Clinica',
-                value: appointment.clinic ?? 'No especificada'),
-            const SizedBox(height: 12),
-            _DetailRow(
-                icon: Icons.access_time,
-                label: 'Dia',
-                value: appointment.date ?? 'Sin fecha'),
-            const SizedBox(height: 12),
-            _DetailRow(
-                icon: Icons.schedule,
-                label: 'Hora',
-                value: appointment.time ?? 'Sin hora'),
-            const SizedBox(height: 12),
-            _DetailRow(
-              icon: appointment.confirmed
-                  ? Icons.check_circle_outline
-                  : Icons.hourglass_empty_outlined,
-              label: 'Estado',
-              value: appointment.confirmed ? 'Confirmada' : 'Pendiente',
-              valueColor: appointment.confirmed
-                  ? AppColors.success
-                  : AppColors.warning,
-            ),
-            if (_isDoctor && appointment.patientName != null) ...[
-              const SizedBox(height: 12),
-              _DetailRow(
-                  icon: Icons.person,
-                  label: 'Paciente',
-                  value: appointment.patientName!),
-            ],
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Cerrar'),
-                    ),
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.85,
+        expand: false,
+        builder: (ctx, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (d) => AlertDialog(
-                            title: Text(
-                              'Eliminar cita',
-                              style: GoogleFonts.dmSans(
-                                fontSize: AppFontSize.body,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            content: Text(
-                              'Seguro que quieres eliminar esta cita?',
-                              style: GoogleFonts.dmSans(
-                                fontSize: AppFontSize.body,
-                              ),
-                            ),
-                            actions: [
-                              SizedBox(
-                                height: 48,
-                                child: TextButton(
-                                  onPressed: () => Navigator.pop(d, false),
-                                  child: Text(
-                                    'Cancelar',
-                                    style: GoogleFonts.dmSans(
-                                      fontSize: AppFontSize.body,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 48,
-                                child: TextButton(
-                                  onPressed: () => Navigator.pop(d, true),
-                                  child: Text(
-                                    'Eliminar',
-                                    style: GoogleFonts.dmSans(
-                                      fontSize: AppFontSize.body,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm == true && context.mounted) {
-                          Navigator.pop(ctx);
-                          await _deleteAppointment(appointment);
-                        }
-                      },
-                      icon: const Icon(Icons.delete_outline,
-                          color: Colors.red, size: 20),
-                      label: const Text('Eliminar',
-                          style: TextStyle(color: Colors.red)),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                appointment.typeDisplay,
+                style: GoogleFonts.dmSans(
+                  fontSize: AppFontSize.subtitle,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _DetailRow(
+                  icon: Icons.person_outline,
+                  label: 'Doctor',
+                  value: appointment.doctor ?? 'No asignado'),
+              const SizedBox(height: 12),
+              _DetailRow(
+                  icon: Icons.location_on_outlined,
+                  label: 'Clinica',
+                  value: appointment.clinic ?? 'No especificada'),
+              const SizedBox(height: 12),
+              _DetailRow(
+                  icon: Icons.access_time,
+                  label: 'Dia',
+                  value: appointment.date ?? 'Sin fecha'),
+              const SizedBox(height: 12),
+              _DetailRow(
+                  icon: Icons.schedule,
+                  label: 'Hora',
+                  value: appointment.time ?? 'Sin hora'),
+              const SizedBox(height: 12),
+              _DetailRow(
+                icon: appointment.confirmed
+                    ? Icons.check_circle_outline
+                    : Icons.hourglass_empty_outlined,
+                label: 'Estado',
+                value: appointment.confirmed ? 'Confirmada' : 'Pendiente',
+                valueColor: appointment.confirmed
+                    ? AppColors.success
+                    : AppColors.warning,
+              ),
+              if (_isDoctor && appointment.patientName != null) ...[
+                const SizedBox(height: 12),
+                _DetailRow(
+                    icon: Icons.person,
+                    label: 'Paciente',
+                    value: appointment.patientName!),
+              ],
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Cerrar'),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (d) => AlertDialog(
+                              title: Text(
+                                'Eliminar cita',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: AppFontSize.body,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              content: Text(
+                                'Seguro que quieres eliminar esta cita?',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: AppFontSize.body,
+                                ),
+                              ),
+                              actions: [
+                                SizedBox(
+                                  height: 48,
+                                  child: TextButton(
+                                    onPressed: () => Navigator.pop(d, false),
+                                    child: Text(
+                                      'Cancelar',
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: AppFontSize.body,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 48,
+                                  child: TextButton(
+                                    onPressed: () => Navigator.pop(d, true),
+                                    child: Text(
+                                      'Eliminar',
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: AppFontSize.body,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true && context.mounted) {
+                            Navigator.pop(ctx);
+                            await _deleteAppointment(appointment);
+                          }
+                        },
+                        icon: const Icon(Icons.delete_outline,
+                            color: Colors.red, size: 20),
+                        label: const Text('Eliminar',
+                            style: TextStyle(color: Colors.red)),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
