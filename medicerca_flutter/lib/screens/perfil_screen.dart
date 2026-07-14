@@ -23,12 +23,12 @@ class PerfilScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 16),
             CircleAvatar(
-              radius: 40,
+              radius: 44,
               backgroundColor: AppColors.primary,
               child: Text(
                 user?.initials ?? '?',
                 style: GoogleFonts.dmSans(
-                  fontSize: 28,
+                  fontSize: AppFontSize.heading,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -38,14 +38,14 @@ class PerfilScreen extends StatelessWidget {
             Text(
               user?.fullName ?? '',
               style: GoogleFonts.dmSans(
-                fontSize: 20,
+                fontSize: AppFontSize.title,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 color: isDoctor ? AppColors.primaryBg : AppColors.successBg,
                 borderRadius: BorderRadius.circular(20),
@@ -53,7 +53,7 @@ class PerfilScreen extends StatelessWidget {
               child: Text(
                 isDoctor ? 'Doctor' : 'Paciente',
                 style: GoogleFonts.dmSans(
-                  fontSize: 12,
+                  fontSize: AppFontSize.body,
                   fontWeight: FontWeight.w600,
                   color: isDoctor ? AppColors.primary : AppColors.success,
                 ),
@@ -87,7 +87,7 @@ class PerfilScreen extends StatelessWidget {
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: 52,
               child: OutlinedButton.icon(
                 onPressed: () async {
                   final confirm = await showDialog<bool>(
@@ -95,21 +95,42 @@ class PerfilScreen extends StatelessWidget {
                     builder: (ctx) => AlertDialog(
                       title: Text(
                         'Cerrar sesion',
-                        style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
+                        style: GoogleFonts.dmSans(
+                          fontSize: AppFontSize.body,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       content: Text(
                         'Estas seguro que quieres cerrar sesion?',
-                        style: GoogleFonts.dmSans(),
+                        style: GoogleFonts.dmSans(
+                          fontSize: AppFontSize.body,
+                        ),
                       ),
                       actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: const Text('Cancelar'),
+                        SizedBox(
+                          height: 48,
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text(
+                              'Cancelar',
+                              style: GoogleFonts.dmSans(
+                                fontSize: AppFontSize.body,
+                              ),
+                            ),
+                          ),
                         ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx, true),
-                          child: const Text('Cerrar sesion',
-                              style: TextStyle(color: Colors.red)),
+                        SizedBox(
+                          height: 48,
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: Text(
+                              'Cerrar sesion',
+                              style: GoogleFonts.dmSans(
+                                fontSize: AppFontSize.body,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -125,10 +146,11 @@ class PerfilScreen extends StatelessWidget {
                     }
                   }
                 },
-                icon: const Icon(Icons.logout, color: Colors.red),
+                icon: const Icon(Icons.logout, color: Colors.red, size: 22),
                 label: Text(
                   'Cerrar sesion',
                   style: GoogleFonts.dmSans(
+                    fontSize: AppFontSize.body,
                     fontWeight: FontWeight.w600,
                     color: Colors.red,
                   ),
@@ -160,7 +182,7 @@ class _ProfileRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.textSecondary),
+        Icon(icon, size: 22, color: AppColors.textSecondary),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -169,14 +191,14 @@ class _ProfileRow extends StatelessWidget {
               Text(
                 label,
                 style: GoogleFonts.dmSans(
-                  fontSize: 11,
+                  fontSize: AppFontSize.body,
                   color: AppColors.textTertiary,
                 ),
               ),
               Text(
                 value,
                 style: GoogleFonts.dmSans(
-                  fontSize: 14,
+                  fontSize: AppFontSize.body,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),

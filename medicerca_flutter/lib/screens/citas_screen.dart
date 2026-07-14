@@ -56,7 +56,7 @@ class _CitasScreenState extends State<CitasScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString();
+          _error = 'No se pudieron cargar las citas';
           _loading = false;
         });
       }
@@ -70,14 +70,17 @@ class _CitasScreenState extends State<CitasScreen> {
         title: Text(_isDoctor ? 'Citas asignadas' : 'Mis citas'),
         actions: [
           if (!_isDoctor)
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const FormStep1Screen()),
-                );
-              },
+            Tooltip(
+              message: 'Agendar nueva cita',
+              child: IconButton(
+                icon: const Icon(Icons.add_circle_outline, size: 26),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FormStep1Screen()),
+                  );
+                },
+              ),
             ),
         ],
       ),
@@ -88,7 +91,18 @@ class _CitasScreenState extends State<CitasScreen> {
   Widget _buildBody() {
     if (_loading) {
       return const Center(
-          child: CircularProgressIndicator(color: AppColors.primary));
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: AppColors.primary),
+              SizedBox(height: 12),
+              Text('Cargando citas...'),
+            ],
+          ),
+        ),
+      );
     }
     if (_error != null) {
       return Center(
@@ -102,10 +116,16 @@ class _CitasScreenState extends State<CitasScreen> {
               const SizedBox(height: 12),
               Text(_error!,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.dmSans(color: AppColors.textSecondary)),
+                  style: GoogleFonts.dmSans(
+                    fontSize: AppFontSize.body,
+                    color: AppColors.textSecondary,
+                  )),
               const SizedBox(height: 16),
-              ElevatedButton(
-                  onPressed: _load, child: const Text('Reintentar')),
+              ElevatedButton.icon(
+                onPressed: _load,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Reintentar'),
+              ),
             ],
           ),
         ),
@@ -122,7 +142,7 @@ class _CitasScreenState extends State<CitasScreen> {
             Text(
               'No hay citas',
               style: GoogleFonts.dmSans(
-                fontSize: 16,
+                fontSize: AppFontSize.body,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
@@ -133,7 +153,9 @@ class _CitasScreenState extends State<CitasScreen> {
                   ? 'Las citas que te asignen apareceran aqui'
                   : 'Agenda tu primera cita',
               style: GoogleFonts.dmSans(
-                  fontSize: 13, color: AppColors.textSecondary),
+                fontSize: AppFontSize.body,
+                color: AppColors.textSecondary,
+              ),
             ),
             if (!_isDoctor) ...[
               const SizedBox(height: 16),
@@ -145,8 +167,11 @@ class _CitasScreenState extends State<CitasScreen> {
                         builder: (_) => const FormStep1Screen()),
                   );
                 },
-                icon: const Icon(Icons.add, size: 18),
+                icon: const Icon(Icons.add, size: 20),
                 label: const Text('Nueva cita'),
+                style: OutlinedButton.styleFrom(
+                  textStyle: GoogleFonts.dmSans(fontSize: AppFontSize.body),
+                ),
               ),
             ],
           ],
@@ -192,7 +217,7 @@ class _CitasScreenState extends State<CitasScreen> {
             Text(
               appointment.typeDisplay,
               style: GoogleFonts.dmSans(
-                fontSize: 18,
+                fontSize: AppFontSize.subtitle,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
@@ -240,7 +265,7 @@ class _CitasScreenState extends State<CitasScreen> {
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: 44,
+                    height: 48,
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(ctx),
                       child: const Text('Cerrar'),
@@ -248,39 +273,69 @@ class _CitasScreenState extends State<CitasScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                SizedBox(
-                  height: 44,
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (d) => AlertDialog(
-                          title: const Text('Eliminar cita'),
-                          content: const Text('Seguro que quieres eliminar esta cita?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(d, false),
-                              child: const Text('Cancelar'),
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (d) => AlertDialog(
+                            title: Text(
+                              'Eliminar cita',
+                              style: GoogleFonts.dmSans(
+                                fontSize: AppFontSize.body,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(d, true),
-                              child: const Text('Eliminar',
-                                  style: TextStyle(color: Colors.red)),
+                            content: Text(
+                              'Seguro que quieres eliminar esta cita?',
+                              style: GoogleFonts.dmSans(
+                                fontSize: AppFontSize.body,
+                              ),
                             ),
-                          ],
-                        ),
-                      );
-                      if (confirm == true && context.mounted) {
-                        Navigator.pop(ctx);
-                        await _deleteAppointment(appointment);
-                      }
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                            actions: [
+                              SizedBox(
+                                height: 48,
+                                child: TextButton(
+                                  onPressed: () => Navigator.pop(d, false),
+                                  child: Text(
+                                    'Cancelar',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: AppFontSize.body,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 48,
+                                child: TextButton(
+                                  onPressed: () => Navigator.pop(d, true),
+                                  child: Text(
+                                    'Eliminar',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: AppFontSize.body,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true && context.mounted) {
+                          Navigator.pop(ctx);
+                          await _deleteAppointment(appointment);
+                        }
+                      },
+                      icon: const Icon(Icons.delete_outline,
+                          color: Colors.red, size: 20),
+                      label: const Text('Eliminar',
+                          style: TextStyle(color: Colors.red)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                      ),
                     ),
-                    child: const Icon(Icons.delete_outline,
-                        color: Colors.red, size: 20),
                   ),
                 ),
               ],
@@ -309,8 +364,8 @@ class _CitasScreenState extends State<CitasScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
+          const SnackBar(
+            content: Text('No se pudo eliminar la cita'),
             backgroundColor: Colors.red,
           ),
         );
@@ -362,13 +417,13 @@ class _AppointmentCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: _typeColor.withAlpha(20),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(_typeIcon, color: _typeColor, size: 22),
+            child: Icon(_typeIcon, color: _typeColor, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -378,7 +433,7 @@ class _AppointmentCard extends StatelessWidget {
                 Text(
                   appointment.typeDisplay,
                   style: GoogleFonts.dmSans(
-                    fontSize: 14,
+                    fontSize: AppFontSize.body,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
@@ -387,13 +442,17 @@ class _AppointmentCard extends StatelessWidget {
                   Text(
                     appointment.doctor!,
                     style: GoogleFonts.dmSans(
-                        fontSize: 12, color: AppColors.textSecondary),
+                      fontSize: AppFontSize.body,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 if (appointment.clinic != null)
                   Text(
                     appointment.clinic!,
                     style: GoogleFonts.dmSans(
-                        fontSize: 11, color: AppColors.textTertiary),
+                      fontSize: AppFontSize.body,
+                      color: AppColors.textTertiary,
+                    ),
                   ),
               ],
             ),
@@ -405,18 +464,22 @@ class _AppointmentCard extends StatelessWidget {
                 Text(
                   appointment.date!,
                   style: GoogleFonts.dmSans(
-                      fontSize: 11, color: AppColors.textTertiary),
+                    fontSize: AppFontSize.body,
+                    color: AppColors.textTertiary,
+                  ),
                 ),
               if (appointment.time != null)
                 Text(
                   appointment.time!,
                   style: GoogleFonts.dmSans(
-                      fontSize: 11, color: AppColors.textTertiary),
+                    fontSize: AppFontSize.body,
+                    color: AppColors.textTertiary,
+                  ),
                 ),
               const SizedBox(height: 4),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: appointment.confirmed
                       ? AppColors.successBg
@@ -426,7 +489,7 @@ class _AppointmentCard extends StatelessWidget {
                 child: Text(
                   appointment.confirmed ? 'Confirmada' : 'Pendiente',
                   style: GoogleFonts.dmSans(
-                    fontSize: 10,
+                    fontSize: AppFontSize.caption,
                     fontWeight: FontWeight.w500,
                     color: appointment.confirmed
                         ? AppColors.success
@@ -459,7 +522,7 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.textTertiary),
+        Icon(icon, size: 20, color: AppColors.textTertiary),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -467,10 +530,12 @@ class _DetailRow extends StatelessWidget {
             children: [
               Text(label,
                   style: GoogleFonts.dmSans(
-                      fontSize: 11, color: AppColors.textTertiary)),
+                    fontSize: AppFontSize.body,
+                    color: AppColors.textTertiary,
+                  )),
               Text(value,
                   style: GoogleFonts.dmSans(
-                    fontSize: 14,
+                    fontSize: AppFontSize.body,
                     fontWeight: FontWeight.w500,
                     color: valueColor ?? AppColors.textPrimary,
                   )),

@@ -75,14 +75,14 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, size: 20),
+                    icon: const Icon(Icons.arrow_back_ios, size: 24),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     'Nueva cita',
                     style: GoogleFonts.lora(
-                      fontSize: 24,
+                      fontSize: AppFontSize.heading,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
@@ -92,7 +92,9 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
               Text(
                 'Selecciona el tipo de consulta',
                 style: GoogleFonts.dmSans(
-                    fontSize: 14, color: AppColors.textSecondary),
+                  fontSize: AppFontSize.body,
+                  color: AppColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 8),
               Row(
@@ -110,7 +112,15 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                   _ProgressDot(active: false),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 4),
+              Text(
+                'Paso 1 de 3',
+                style: GoogleFonts.dmSans(
+                  fontSize: AppFontSize.body,
+                  color: AppColors.textTertiary,
+                ),
+              ),
+              const SizedBox(height: 16),
               Expanded(
                 child: ListView(
                   children: [
@@ -144,8 +154,8 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                             child: Row(
                               children: [
                                 Container(
-                                  width: 44,
-                                  height: 44,
+                                  width: 48,
+                                  height: 48,
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? AppColors.primary.withAlpha(20)
@@ -157,7 +167,7 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                                     color: isSelected
                                         ? AppColors.primary
                                         : AppColors.textSecondary,
-                                    size: 22,
+                                    size: 24,
                                   ),
                                 ),
                                 const SizedBox(width: 14),
@@ -169,7 +179,7 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                                       Text(
                                         t.title,
                                         style: GoogleFonts.dmSans(
-                                          fontSize: 15,
+                                          fontSize: AppFontSize.body,
                                           fontWeight: FontWeight.w600,
                                           color: isSelected
                                               ? AppColors.primary
@@ -179,7 +189,7 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                                       Text(
                                         t.description,
                                         style: GoogleFonts.dmSans(
-                                          fontSize: 12,
+                                          fontSize: AppFontSize.body,
                                           color: AppColors.textSecondary,
                                         ),
                                       ),
@@ -188,7 +198,7 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                                 ),
                                 if (isSelected)
                                   const Icon(Icons.check_circle,
-                                      color: AppColors.primary, size: 22),
+                                      color: AppColors.primary, size: 24),
                               ],
                             ),
                           ),
@@ -199,7 +209,7 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                     Text(
                       'Doctor',
                       style: GoogleFonts.dmSans(
-                        fontSize: 13,
+                        fontSize: AppFontSize.body,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
@@ -224,7 +234,9 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                         child: Text(
                           'No hay doctores disponibles',
                           style: GoogleFonts.dmSans(
-                              color: AppColors.textSecondary),
+                            fontSize: AppFontSize.body,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       )
                     else
@@ -242,7 +254,9 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                             hint: Text(
                               'Seleccionar doctor',
                               style: GoogleFonts.dmSans(
-                                  color: AppColors.textTertiary),
+                                fontSize: AppFontSize.body,
+                                color: AppColors.textTertiary,
+                              ),
                             ),
                             isExpanded: true,
                             items: _doctors.map((d) {
@@ -250,7 +264,8 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                                 value: d,
                                 child: Text(
                                   d.fullName,
-                                  style: GoogleFonts.dmSans(fontSize: 14),
+                                  style: GoogleFonts.dmSans(
+                                      fontSize: AppFontSize.body),
                                 ),
                               );
                             }).toList(),
@@ -274,8 +289,8 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
+                height: 52,
+                child: ElevatedButton.icon(
                   onPressed: selectedType.isEmpty
                       ? null
                       : () {
@@ -285,7 +300,8 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                                 builder: (_) => const FormStep2Screen()),
                           );
                         },
-                  child: const Text('Siguiente'),
+                  icon: const Icon(Icons.arrow_forward, size: 20),
+                  label: const Text('Siguiente'),
                 ),
               ),
             ],
@@ -313,12 +329,15 @@ class _ProgressDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 12,
-      height: 12,
+      width: 16,
+      height: 16,
       decoration: BoxDecoration(
         color: active ? AppColors.primary : AppColors.border,
         shape: BoxShape.circle,
       ),
+      child: active
+          ? const Icon(Icons.check, color: Colors.white, size: 10)
+          : null,
     );
   }
 }

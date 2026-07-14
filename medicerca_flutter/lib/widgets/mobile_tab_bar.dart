@@ -45,7 +45,7 @@ class MobileTabBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 60,
+          height: 64,
           child: Row(
             children: List.generate(tabs.length, (i) {
               final tab = tabs[i];
@@ -59,14 +59,14 @@ class MobileTabBar extends StatelessWidget {
                     children: [
                       Icon(
                         isActive ? tab.activeIcon : tab.icon,
-                        size: 22,
+                        size: 24,
                         color: isActive ? AppColors.primary : AppColors.textTertiary,
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         tab.label,
                         style: GoogleFonts.dmSans(
-                          fontSize: 10,
+                          fontSize: AppFontSize.small,
                           fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                           color: isActive ? AppColors.primary : AppColors.textTertiary,
                         ),

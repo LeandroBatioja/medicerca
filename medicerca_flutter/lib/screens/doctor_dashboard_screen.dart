@@ -19,6 +19,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   List<Prescription> _prescriptions = [];
   List<Appointment> _appointments = [];
   bool _loading = true;
+  String? _error;
   int _lastLoadedTab = -1;
 
   @override
@@ -51,10 +52,16 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
           _prescriptions = results[1] as List<Prescription>;
           _appointments = results[2] as List<Appointment>;
           _loading = false;
+          _error = null;
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = 'No se pudieron cargar los datos';
+        });
+      }
     }
   }
 
@@ -67,211 +74,256 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         hour < 12 ? 'Buenos dias' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
 
     return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    user?.initials ?? '?',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.primary,
+                    child: Text(
+                      user?.initials ?? '?',
+                      style: GoogleFonts.dmSans(
+                        fontSize: AppFontSize.body,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$greeting,',
-                        style: GoogleFonts.dmSans(
-                            fontSize: 13, color: AppColors.textSecondary),
-                      ),
-                      Text(
-                        'Dr. ${user?.fullName.split(' ').first ?? ''}',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$greeting,',
+                          style: GoogleFonts.dmSans(
+                            fontSize: AppFontSize.body,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
+                        Text(
+                          'Dr. ${user?.fullName.split(' ').first ?? ''}',
+                          style: GoogleFonts.dmSans(
+                            fontSize: AppFontSize.subtitle,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const CrearRecetaScreen()),
+                        );
+                      },
+                      icon: const Icon(Icons.add, size: 20, color: Colors.white),
+                      label: const Text('Nueva receta'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(10),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  _DoctorQuickAction(
+                    icon: Icons.people_outline,
+                    label: 'Mis pacientes',
+                    color: AppColors.primary,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const PacientesScreen()),
+                      );
+                    },
                   ),
-                  child: ElevatedButton.icon(
-                    onPressed: () {
+                  const SizedBox(width: 12),
+                  _DoctorQuickAction(
+                    icon: Icons.add_circle_outline,
+                    label: 'Nueva receta',
+                    color: AppColors.success,
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => const CrearRecetaScreen()),
                       );
                     },
-                    icon: const Icon(Icons.add, size: 18, color: Colors.white),
-                    label: const Text('Nueva receta'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _DoctorQuickAction(
+                    icon: Icons.receipt_long_outlined,
+                    label: 'Recetas creadas',
+                    color: AppColors.warning,
+                    onTap: () => appState.switchTab(2),
+                  ),
+                  const SizedBox(width: 12),
+                  _DoctorQuickAction(
+                    icon: Icons.calendar_today_outlined,
+                    label: 'Ver citas',
+                    color: const Color(0xFF8B5CF6),
+                    onTap: () => appState.switchTab(1),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              if (_loading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(color: AppColors.primary),
+                        SizedBox(height: 12),
+                        Text('Cargando información...'),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                _DoctorQuickAction(
-                  icon: Icons.people_outline,
-                  label: 'Mis\npacientes',
-                  color: AppColors.primary,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const PacientesScreen()),
-                    );
-                  },
-                ),
-                const SizedBox(width: 10),
-                _DoctorQuickAction(
-                  icon: Icons.add_circle_outline,
-                  label: 'Nueva\nreceta',
-                  color: AppColors.success,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const CrearRecetaScreen()),
-                    );
-                  },
-                ),
-                const SizedBox(width: 10),
-                _DoctorQuickAction(
-                  icon: Icons.receipt_long_outlined,
-                  label: 'Recetas\ncreadas',
-                  color: AppColors.warning,
-                  onTap: () => appState.switchTab(2),
-                ),
-                const SizedBox(width: 10),
-                _DoctorQuickAction(
-                  icon: Icons.calendar_today_outlined,
-                  label: 'Citas\nhoy',
-                  color: const Color(0xFF8B5CF6),
-                  onTap: () => appState.switchTab(1),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                    child: _DoctorStat(
-                        value: '${_patients.length}',
-                        label: 'Pacientes',
-                        color: AppColors.primary)),
-                const SizedBox(width: 10),
-                Expanded(
-                    child: _DoctorStat(
-                        value: '${_prescriptions.length}',
-                        label: 'Recetas',
-                        color: AppColors.success)),
-                const SizedBox(width: 10),
-                Expanded(
-                    child: _DoctorStat(
-                        value: '${_appointments.length}',
-                        label: 'Citas',
-                        color: AppColors.warning)),
-              ],
-            ),
-            const SizedBox(height: 20),
-            if (_appointments.isNotEmpty) ...[
-              Text(
-                'Citas recientes',
-                style: GoogleFonts.dmSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              ..._appointments.take(3).map((a) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _ActivityItem(
-                      icon: Icons.event,
-                      color: AppColors.primary,
-                      title: a.typeDisplay,
-                      subtitle: a.patientName ?? '',
-                      time: a.date ?? '',
+                )
+              else if (_error != null)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.error_outline,
+                            size: 48, color: AppColors.textTertiary),
+                        const SizedBox(height: 12),
+                        Text(
+                          _error!,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.dmSans(
+                            fontSize: AppFontSize.body,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: _load,
+                          icon: const Icon(Icons.refresh, size: 18),
+                          label: const Text('Reintentar'),
+                        ),
+                      ],
                     ),
-                  )),
-            ],
-            if (_patients.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                'Pacientes recientes',
-                style: GoogleFonts.dmSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              ..._patients.take(3).map((p) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _ActivityItem(
-                      icon: Icons.person,
-                      color: AppColors.success,
-                      title: p.fullName,
-                      subtitle: p.email,
-                      time: '',
-                    ),
-                  )),
-            ],
-            if (!_loading && _patients.isEmpty && _appointments.isEmpty) ...[
-              const SizedBox(height: 40),
-              Center(
-                child: Column(
+                  ),
+                )
+              else ...[
+                Row(
                   children: [
-                    Icon(Icons.medical_services_outlined,
-                        size: 48, color: AppColors.textTertiary),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Bienvenido Dr. ${user?.fullName.split(' ').first ?? ''}',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Crea una receta o revisa tus pacientes',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
+                    Expanded(
+                        child: _DoctorStat(
+                            value: '${_patients.length}',
+                            label: 'Pacientes',
+                            color: AppColors.primary)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: _DoctorStat(
+                            value: '${_prescriptions.length}',
+                            label: 'Recetas',
+                            color: AppColors.success)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: _DoctorStat(
+                            value: '${_appointments.length}',
+                            label: 'Citas',
+                            color: AppColors.warning)),
                   ],
                 ),
-              ),
+                const SizedBox(height: 20),
+                if (_appointments.isNotEmpty) ...[
+                  Text(
+                    'Citas recientes',
+                    style: GoogleFonts.dmSans(
+                      fontSize: AppFontSize.body,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ..._appointments.take(3).map((a) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _ActivityItem(
+                          icon: Icons.event,
+                          color: AppColors.primary,
+                          title: a.typeDisplay,
+                          subtitle: a.patientName ?? '',
+                          time: a.date ?? '',
+                        ),
+                      )),
+                ],
+                if (_patients.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    'Pacientes recientes',
+                    style: GoogleFonts.dmSans(
+                      fontSize: AppFontSize.body,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ..._patients.take(3).map((p) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _ActivityItem(
+                          icon: Icons.person,
+                          color: AppColors.success,
+                          title: p.fullName,
+                          subtitle: p.email,
+                          time: '',
+                        ),
+                      )),
+                ],
+                if (_patients.isEmpty && _appointments.isEmpty) ...[
+                  const SizedBox(height: 40),
+                  Center(
+                    child: Column(
+                      children: [
+                        Icon(Icons.medical_services_outlined,
+                            size: 48, color: AppColors.textTertiary),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Bienvenido Dr. ${user?.fullName.split(' ').first ?? ''}',
+                          style: GoogleFonts.dmSans(
+                            fontSize: AppFontSize.body,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Crea una receta o revisa tus pacientes',
+                          style: GoogleFonts.dmSans(
+                            fontSize: AppFontSize.body,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -297,7 +349,7 @@ class _DoctorQuickAction extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
@@ -305,16 +357,15 @@ class _DoctorQuickAction extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(icon, color: color, size: 22),
-              const SizedBox(height: 4),
+              Icon(icon, color: color, size: 24),
+              const SizedBox(height: 6),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.dmSans(
-                  fontSize: 10,
+                  fontSize: AppFontSize.small,
                   fontWeight: FontWeight.w500,
                   color: AppColors.textSecondary,
-                  height: 1.2,
                 ),
               ),
             ],
@@ -347,13 +398,18 @@ class _DoctorStat extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.dmSans(
-                fontSize: 22, fontWeight: FontWeight.w700, color: color),
+              fontSize: AppFontSize.title,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
             style: GoogleFonts.dmSans(
-                fontSize: 11, color: AppColors.textSecondary),
+              fontSize: AppFontSize.body,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -388,13 +444,13 @@ class _ActivityItem extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: color.withAlpha(20),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 18),
+            child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -404,7 +460,7 @@ class _ActivityItem extends StatelessWidget {
                 Text(
                   title,
                   style: GoogleFonts.dmSans(
-                    fontSize: 13,
+                    fontSize: AppFontSize.body,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
@@ -412,7 +468,9 @@ class _ActivityItem extends StatelessWidget {
                 Text(
                   subtitle,
                   style: GoogleFonts.dmSans(
-                      fontSize: 11, color: AppColors.textSecondary),
+                    fontSize: AppFontSize.body,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -421,7 +479,9 @@ class _ActivityItem extends StatelessWidget {
             Text(
               time,
               style: GoogleFonts.dmSans(
-                  fontSize: 10, color: AppColors.textTertiary),
+                fontSize: AppFontSize.body,
+                color: AppColors.textTertiary,
+              ),
             ),
         ],
       ),

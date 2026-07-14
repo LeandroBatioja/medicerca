@@ -32,19 +32,30 @@ class _FormStep3ScreenState extends State<FormStep3Screen> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, size: 20),
+                    icon: const Icon(Icons.arrow_back_ios, size: 24),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     'Confirmar cita',
                     style: GoogleFonts.lora(
-                      fontSize: 22,
+                      fontSize: AppFontSize.heading,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.only(left: 52),
+                child: Text(
+                  'Paso 3 de 3',
+                  style: GoogleFonts.dmSans(
+                    fontSize: AppFontSize.body,
+                    color: AppColors.textTertiary,
+                  ),
+                ),
               ),
               const SizedBox(height: 8),
               Padding(
@@ -86,13 +97,13 @@ class _FormStep3ScreenState extends State<FormStep3Screen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(Icons.event,
-                              color: AppColors.primary, size: 20),
+                              color: AppColors.primary, size: 22),
                         ),
                         const SizedBox(width: 12),
                         Text(
                           'Resumen de tu cita',
                           style: GoogleFonts.dmSans(
-                            fontSize: 16,
+                            fontSize: AppFontSize.body,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
                           ),
@@ -126,42 +137,55 @@ class _FormStep3ScreenState extends State<FormStep3Screen> {
               if (_error != null)
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(top: 12),
                   decoration: BoxDecoration(
                     color: Colors.red.shade50,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.red.shade200),
                   ),
-                  child: Text(_error!,
-                      style: GoogleFonts.dmSans(
-                          fontSize: 13, color: Colors.red.shade700)),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline,
+                          size: 20, color: Colors.red.shade700),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _error!,
+                          style: GoogleFonts.dmSans(
+                            fontSize: AppFontSize.body,
+                            color: Colors.red.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 52,
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: _submitting ? null : _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: _submitting
+                  icon: _submitting
                       ? const SizedBox(
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
-                      : Text(
-                          'Confirmar cita',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            strokeWidth: 2.5,
                             color: Colors.white,
                           ),
-                        ),
+                        )
+                      : const Icon(Icons.check_circle_outline, size: 22),
+                  label: _submitting
+                      ? const Text('Confirmando cita...')
+                      : const Text('Confirmar cita'),
+                  style: ElevatedButton.styleFrom(
+                    textStyle: GoogleFonts.dmSans(
+                      fontSize: AppFontSize.body,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -200,7 +224,7 @@ class _FormStep3ScreenState extends State<FormStep3Screen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Error al agendar: $e';
+          _error = 'No se pudo agendar la cita. Intenta de nuevo.';
           _submitting = false;
         });
       }
@@ -220,12 +244,14 @@ class _SummaryRow extends StatelessWidget {
       children: [
         Text(label,
             style: GoogleFonts.dmSans(
-                fontSize: 13, color: AppColors.textSecondary)),
+              fontSize: AppFontSize.body,
+              color: AppColors.textSecondary,
+            )),
         Flexible(
           child: Text(
             value,
             style: GoogleFonts.dmSans(
-              fontSize: 14,
+              fontSize: AppFontSize.body,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
@@ -244,12 +270,15 @@ class _ProgressDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 12,
-      height: 12,
+      width: 16,
+      height: 16,
       decoration: BoxDecoration(
         color: active ? AppColors.primary : AppColors.border,
         shape: BoxShape.circle,
       ),
+      child: active
+          ? const Icon(Icons.check, color: Colors.white, size: 10)
+          : null,
     );
   }
 }

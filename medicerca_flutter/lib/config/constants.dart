@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
 
+class AppFontSize {
+  AppFontSize._();
+
+  static const double caption = 12.0;
+  static const double small = 13.0;
+  static const double body = 16.0;
+  static const double subtitle = 18.0;
+  static const double title = 20.0;
+  static const double heading = 24.0;
+}
+
 class AppColors {
   AppColors._();
 
@@ -9,11 +20,11 @@ class AppColors {
   static const Color primaryBg = Color(0xFFE0F2FE);
   static const Color primary50 = Color(0xFFF0F9FF);
 
-  static const Color success = Color(0xFF059669);
+  static const Color success = Color(0xFF047857);
   static const Color successLight = Color(0xFF10B981);
   static const Color successBg = Color(0xFFECFDF5);
 
-  static const Color warning = Color(0xFFD97706);
+  static const Color warning = Color(0xFFB45309);
   static const Color warningBg = Color(0xFFFFFBEB);
 
   static const Color bg = Color(0xFFF1F5F9);
@@ -21,8 +32,8 @@ class AppColors {
   static const Color surfaceElevated = Colors.white;
 
   static const Color textPrimary = Color(0xFF1E293B);
-  static const Color textSecondary = Color(0xFF64748B);
-  static const Color textTertiary = Color(0xFF94A3B8);
+  static const Color textSecondary = Color(0xFF475569);
+  static const Color textTertiary = Color(0xFF64748B);
   static const Color textOnPrimary = Colors.white;
 
   static const Color border = Color(0xFFE2E8F0);

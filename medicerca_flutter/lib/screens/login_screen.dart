@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       'MediCerca',
                       style: GoogleFonts.lora(
-                        fontSize: 26,
+                        fontSize: AppFontSize.heading,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                       ),
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       'Tu salud, cerca de ti',
                       style: GoogleFonts.dmSans(
-                        fontSize: 14,
+                        fontSize: AppFontSize.subtitle,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // Trust badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         color: AppColors.successBg,
                         borderRadius: BorderRadius.circular(20),
@@ -118,12 +118,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.verified_user, size: 14, color: AppColors.success),
-                          const SizedBox(width: 4),
+                          const Icon(Icons.verified_user, size: 18, color: AppColors.success),
+                          const SizedBox(width: 6),
                           Text(
                             'Conexion segura',
                             style: GoogleFonts.dmSans(
-                              fontSize: 11,
+                              fontSize: AppFontSize.body,
                               color: AppColors.success,
                               fontWeight: FontWeight.w500,
                             ),
@@ -137,9 +137,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
+                      style: GoogleFonts.dmSans(fontSize: AppFontSize.body),
+                      decoration: InputDecoration(
                         labelText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined, size: 20),
+                        labelStyle: GoogleFonts.dmSans(fontSize: AppFontSize.body),
+                        prefixIcon: const Icon(Icons.email_outlined, size: 22),
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) return 'Email requerido';
@@ -153,11 +155,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _passCtrl,
                       obscureText: _obscure,
+                      style: GoogleFonts.dmSans(fontSize: AppFontSize.body),
                       decoration: InputDecoration(
                         labelText: 'Contrasena',
-                        prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                        labelStyle: GoogleFonts.dmSans(fontSize: AppFontSize.body),
+                        prefixIcon: const Icon(Icons.lock_outline, size: 22),
                         suffixIcon: IconButton(
-                          icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, size: 20),
+                          icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, size: 22),
                           onPressed: () => setState(() => _obscure = !_obscure),
                         ),
                       ),
@@ -172,16 +176,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (_error != null)
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
                           color: Colors.red.shade50,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.red.shade200),
                         ),
-                        child: Text(
-                          _error!,
-                          style: GoogleFonts.dmSans(fontSize: 13, color: Colors.red.shade700),
+                        child: Row(
+                          children: [
+                            Icon(Icons.error_outline, size: 20, color: Colors.red.shade700),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _error!,
+                                style: GoogleFonts.dmSans(
+                                  fontSize: AppFontSize.body,
+                                  color: Colors.red.shade700,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
@@ -190,19 +205,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Login button
                     SizedBox(
                       width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
+                      height: 52,
+                      child: ElevatedButton.icon(
                         onPressed: appState.isLoading ? null : _login,
-                        child: appState.isLoading
+                        icon: appState.isLoading
                             ? const SizedBox(
-                                width: 20,
-                                height: 20,
+                                width: 22,
+                                height: 22,
                                 child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                                  strokeWidth: 2.5,
                                   color: Colors.white,
                                 ),
                               )
+                            : const Icon(Icons.login, size: 22),
+                        label: appState.isLoading
+                            ? const Text('Iniciando sesion...')
                             : const Text('Iniciar sesion'),
+                        style: ElevatedButton.styleFrom(
+                          textStyle: GoogleFonts.dmSans(
+                            fontSize: AppFontSize.body,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -213,7 +237,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Text(
                           'No tienes cuenta? ',
-                          style: GoogleFonts.dmSans(color: AppColors.textSecondary, fontSize: 14),
+                          style: GoogleFonts.dmSans(
+                            color: AppColors.textSecondary,
+                            fontSize: AppFontSize.body,
+                          ),
                         ),
                         GestureDetector(
                           onTap: () {
@@ -227,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: GoogleFonts.dmSans(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                              fontSize: AppFontSize.body,
                             ),
                           ),
                         ),

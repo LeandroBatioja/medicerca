@@ -200,10 +200,10 @@ class AppSidebar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                       Text(
                         appState.user?.fullName ?? '',
                         style: GoogleFonts.dmSans(
-                          fontSize: 13,
+                          fontSize: AppFontSize.body,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -212,26 +212,29 @@ class AppSidebar extends StatelessWidget {
                       Text(
                         isDoctor ? 'Doctor' : 'Paciente',
                         style: GoogleFonts.dmSans(
-                          fontSize: 11,
-                          color: AppColors.textTertiary,
+                          fontSize: AppFontSize.body,
+                          color: const Color(0xFF94A3B8),
                         ),
                       ),
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.logout,
-                      size: 18, color: AppColors.textTertiary),
-                  onPressed: () async {
-                    await appState.logout();
-                    if (context.mounted) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const LoginScreen()),
-                      );
-                    }
-                  },
+                Tooltip(
+                  message: 'Cerrar sesion',
+                  child: IconButton(
+                    icon: const Icon(Icons.logout,
+                        size: 22, color: Color(0xFF94A3B8)),
+                    onPressed: () async {
+                      await appState.logout();
+                      if (context.mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const LoginScreen()),
+                        );
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
@@ -259,17 +262,16 @@ class _SidebarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon,
-          color: active ? Colors.white : AppColors.textTertiary, size: 20),
+          color: active ? Colors.white : const Color(0xFF94A3B8), size: 22),
       title: Text(
         label,
         style: GoogleFonts.dmSans(
-          fontSize: 14,
+          fontSize: AppFontSize.body,
           fontWeight: active ? FontWeight.w600 : FontWeight.w400,
           color: active ? Colors.white : Colors.white.withAlpha(180),
         ),
       ),
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       tileColor: active ? const Color(0xFF334155) : Colors.transparent,
       onTap: onTap,
