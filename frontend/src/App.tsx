@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { C, type Screen, type Booking } from "./types";
+import { C, type Screen, type Booking, type UserRole } from "./types";
 import { api } from "./api";
 import { Sidebar } from "./components/Sidebar";
 
 import { ScreenLogin } from "./screens/ScreenLogin";
 import { ScreenRegistro } from "./screens/ScreenRegistro";
 import { ScreenInicio } from "./screens/ScreenInicio";
+import { ScreenDoctorDashboard } from "./screens/ScreenDoctorDashboard";
 import { FormStep1 } from "./screens/FormStep1";
 import { FormStep2 } from "./screens/FormStep2";
 import { FormStep3 } from "./screens/FormStep3";
 import { ScreenConfirmacion } from "./screens/ScreenConfirmacion";
 import { ScreenRecetas } from "./screens/ScreenRecetas";
+import { ScreenCrearReceta } from "./screens/ScreenCrearReceta";
 import { ScreenAsistencia } from "./screens/ScreenAsistencia";
 import { ScreenSoporte } from "./screens/ScreenSoporte";
 
@@ -18,11 +20,14 @@ function AppContent() {
   const [stack, setStack] = useState<Screen[]>(["login"]);
   const [booking, setBooking] = useState<Booking>({ type: null, slot: null });
   const [userName, setUserName] = useState("Usuario");
+  const [userRole, setUserRole] = useState<UserRole>("patient");
 
   useEffect(() => {
     const token = api.loadToken();
     if (token) {
-      setStack(["inicio"]);
+      const role = api.getUserRole();
+      setUserRole(role);
+      setStack([role === "doctor" ? "inicio" : "inicio"]);
     }
   }, []);
 
@@ -30,8 +35,9 @@ function AppContent() {
   const push = (s: Screen) => setStack((prev) => [...prev, s]);
   const pop = () => setStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
 
-  const handleLogin = (name: string) => {
+  const handleLogin = (name: string, role: UserRole) => {
     setUserName(name);
+    setUserRole(role);
     push("inicio");
   };
 
@@ -39,6 +45,7 @@ function AppContent() {
     api.logout();
     setStack(["login"]);
     setUserName("Usuario");
+    setUserRole("patient");
     setBooking({ type: null, slot: null });
   };
 
@@ -50,6 +57,25 @@ function AppContent() {
   const isAuth = current !== "login" && current !== "registro";
 
   const renderScreen = () => {
+    if (userRole === "doctor") {
+      switch (current) {
+        case "login":
+          return <ScreenLogin onLogin={handleLogin} onNavigate={push} />;
+        case "registro":
+          return <ScreenRegistro onNavigate={push} onBack={pop} />;
+        case "inicio":
+          return <ScreenDoctorDashboard onNavigate={push} userName={userName} />;
+        case "crear-receta":
+          return <ScreenCrearReceta onNavigate={push} />;
+        case "recetas":
+          return <ScreenRecetas onNavigate={push} />;
+        case "soporte":
+          return <ScreenSoporte onNavigate={push} />;
+        default:
+          return <ScreenDoctorDashboard onNavigate={push} userName={userName} />;
+      }
+    }
+
     switch (current) {
       case "login":
         return <ScreenLogin onLogin={handleLogin} onNavigate={push} />;
@@ -84,7 +110,7 @@ function AppContent() {
 
   return (
     <div className="flex min-h-screen" style={{ background: C.bg }}>
-      <Sidebar current={current} onNavigate={push} onLogout={handleLogout} userName={userName} />
+      <Sidebar current={current} onNavigate={push} onLogout={handleLogout} userName={userName} userRole={userRole} />
       <main className="flex-1 min-w-0">
         {renderScreen()}
       </main>

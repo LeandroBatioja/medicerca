@@ -1,3 +1,5 @@
+import type { UserRole } from "./types";
+
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 class ApiClient {
@@ -18,6 +20,14 @@ class ApiClient {
     return t;
   }
 
+  setUserRole(role: UserRole) {
+    localStorage.setItem("medicerca_role", role);
+  }
+
+  getUserRole(): UserRole {
+    return (localStorage.getItem("medicerca_role") as UserRole) || "patient";
+  }
+
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -35,26 +45,29 @@ class ApiClient {
   }
 
   // Auth
-  async register(email: string, password: string, fullName: string) {
-    const data = await this.request<{ token: string; user: { id: number; email: string; fullName: string } }>(
+  async register(email: string, password: string, fullName: string, role: UserRole = "patient") {
+    const data = await this.request<{ token: string; user: { id: number; email: string; fullName: string; role: UserRole } }>(
       "/api/auth/register",
-      { method: "POST", body: JSON.stringify({ email, password, fullName }) }
+      { method: "POST", body: JSON.stringify({ email, password, fullName, role }) }
     );
     this.setToken(data.token);
+    this.setUserRole(data.user.role);
     return data;
   }
 
   async login(email: string, password: string) {
-    const data = await this.request<{ token: string; user: { id: number; email: string; fullName: string } }>(
+    const data = await this.request<{ token: string; user: { id: number; email: string; fullName: string; role: UserRole } }>(
       "/api/auth/login",
       { method: "POST", body: JSON.stringify({ email, password }) }
     );
     this.setToken(data.token);
+    this.setUserRole(data.user.role);
     return data;
   }
 
   logout() {
     this.setToken(null);
+    localStorage.removeItem("medicerca_role");
   }
 
   // Appointments
@@ -71,11 +84,29 @@ class ApiClient {
     );
   }
 
-  // Prescriptions
+  // Prescriptions (patient)
   async getPrescriptions() {
-    return this.request<{ id: number; medication: string; frequency: string; refills: number; date: string }[]>(
+    return this.request<{ id: number; medication: string; frequency: string; refills: number; date: string; doctor_id?: number }[]>(
       "/api/prescriptions"
     );
+  }
+
+  // Prescriptions (doctor)
+  async getCreatedPrescriptions() {
+    return this.request<{ id: number; medication: string; frequency: string; refills: number; date: string; patient_id: number; patient_name: string }[]>(
+      "/api/prescriptions/created"
+    );
+  }
+
+  async getPatients() {
+    return this.request<{ id: number; full_name: string; email: string }[]>("/api/prescriptions/patients");
+  }
+
+  async createPrescription(medication: string, frequency: string, refills: number, patientId: number) {
+    return this.request<{ id: number }>("/api/prescriptions", {
+      method: "POST",
+      body: JSON.stringify({ medication, frequency, refills, patientId }),
+    });
   }
 
   // Home services

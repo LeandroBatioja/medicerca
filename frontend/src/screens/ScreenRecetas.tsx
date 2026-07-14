@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Pill, AlertCircle, FileText } from "lucide-react";
-import { C, type Screen, type Prescription } from "../types";
+import { Pill, AlertCircle, FileText, ArrowRight } from "lucide-react";
 import { api } from "../api";
+import type { Screen, Prescription } from "../types";
 
 export function ScreenRecetas({
   onNavigate,
 }: {
   onNavigate: (s: Screen) => void;
 }) {
+  const isDoctor = api.getUserRole() === "doctor";
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,7 +17,9 @@ export function ScreenRecetas({
     const fetchPrescriptions = async () => {
       setLoading(true);
       try {
-        const data = await api.getPrescriptions();
+        const data = isDoctor
+          ? await api.getCreatedPrescriptions()
+          : await api.getPrescriptions();
         setPrescriptions(data);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Error al cargar recetas");
@@ -25,83 +28,120 @@ export function ScreenRecetas({
       }
     };
     fetchPrescriptions();
-  }, []);
+  }, [isDoctor]);
 
   return (
     <div className="p-6 lg:p-10 max-w-4xl mx-auto">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
-        <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: C.brand }}>Inicio</button>
+      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: "#64748B" }}>
+        <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: "#0F766E" }}>Dashboard</button>
         <span>/</span>
-        <span style={{ color: C.text }}>Mis recetas</span>
+        <span style={{ color: "#0F172A" }}>Recetas</span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
-        Mis recetas
-      </h1>
-      <p className="text-base mb-8" style={{ color: C.textSecondary }}>
-        Consulta tus recetas medicas digitales
-      </p>
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: "#0F172A", fontFamily: "'Lora', serif" }}>
+            {isDoctor ? "Recetas creadas" : "Mis recetas"}
+          </h1>
+          <p className="text-base" style={{ color: "#64748B" }}>
+            {isDoctor ? "Recetas que has registrado para tus pacientes" : "Consulta tus recetas medicas digitales"}
+          </p>
+        </div>
+        {isDoctor && (
+          <button
+            onClick={() => onNavigate("crear-receta")}
+            className="h-11 px-5 rounded-xl font-semibold text-sm flex items-center gap-2 cursor-pointer shrink-0"
+            style={{ background: "#7C3AED", color: "#fff" }}
+          >
+            <FileText size={16} />
+            Nueva receta
+          </button>
+        )}
+      </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="flex items-center gap-3 px-6 py-4 rounded-xl" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: C.border, borderTopColor: C.brand }} />
-            <span className="text-sm font-medium" style={{ color: C.textSecondary }}>Cargando recetas...</span>
+          <div className="flex items-center gap-3 px-6 py-4 rounded-xl" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+            <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#0F766E" }} />
+            <span className="text-sm font-medium" style={{ color: "#64748B" }}>Cargando recetas...</span>
           </div>
         </div>
       ) : error ? (
-        <div
-          className="flex items-start gap-3 rounded-xl px-5 py-4"
-          style={{ background: C.errorLight, border: `1px solid rgba(220,38,38,0.15)` }}
-        >
-          <AlertCircle size={18} color={C.error} className="mt-0.5 shrink-0" />
-          <p className="text-sm" style={{ color: C.error }}>{error}</p>
+        <div className="flex items-start gap-3 rounded-xl px-5 py-4" style={{ background: "#FEE2E2", border: "1px solid rgba(220,38,38,0.12)" }}>
+          <AlertCircle size={18} color="#DC2626" className="mt-0.5 shrink-0" />
+          <p className="text-sm" style={{ color: "#DC2626" }}>{error}</p>
         </div>
       ) : prescriptions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 rounded-2xl border" style={{ background: C.surface, borderColor: C.border }}>
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: C.brandLight }}>
-            <FileText size={28} color={C.brand} />
+        <div className="flex flex-col items-center justify-center py-20 rounded-2xl border" style={{ background: "#FFFFFF", borderColor: "#E2E8F0" }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: "#CCFBF1" }}>
+            <FileText size={28} color="#0F766E" />
           </div>
-          <p className="text-lg font-semibold mb-1" style={{ color: C.text }}>Sin recetas registradas</p>
-          <p className="text-sm" style={{ color: C.textSecondary }}>Aqui apareceran tus recetas cuando tu doctor las registre.</p>
+          <p className="text-lg font-semibold mb-1" style={{ color: "#0F172A" }}>
+            {isDoctor ? "Sin recetas creadas" : "Sin recetas registradas"}
+          </p>
+          <p className="text-sm mb-6" style={{ color: "#64748B" }}>
+            {isDoctor ? "Crea tu primera receta para un paciente." : "Aqui apareceran tus recetas cuando tu doctor las registre."}
+          </p>
+          {isDoctor && (
+            <button
+              onClick={() => onNavigate("crear-receta")}
+              className="h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-2 cursor-pointer"
+              style={{ background: "#7C3AED", color: "#fff" }}
+            >
+              Crear receta <ArrowRight size={16} />
+            </button>
+          )}
         </div>
       ) : (
-        <div className="rounded-2xl border overflow-hidden" style={{ background: C.surface, borderColor: C.border, boxShadow: C.shadow }}>
-          {/* Table header */}
+        <div className="rounded-2xl border overflow-hidden" style={{ background: "#FFFFFF", borderColor: "#E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
           <div
-            className="grid grid-cols-12 gap-4 px-5 py-3 text-xs font-semibold uppercase tracking-wider border-b"
-            style={{ background: C.bg, borderColor: C.border, color: C.textMuted }}
+            className="grid gap-4 px-5 py-3 text-xs font-semibold uppercase tracking-wider border-b"
+            style={{
+              gridTemplateColumns: isDoctor ? "2fr 2fr 1fr 1fr 1fr" : "3fr 2fr 1fr 1.5fr",
+              background: "#F8FAFC",
+              borderColor: "#E2E8F0",
+              color: "#94A3B8",
+            }}
           >
-            <div className="col-span-4">Medicamento</div>
-            <div className="col-span-3">Frecuencia</div>
-            <div className="col-span-2">Repeticiones</div>
-            <div className="col-span-3">Fecha</div>
+            <div>{isDoctor ? "Paciente" : "Medicamento"}</div>
+            <div>Medicamento</div>
+            <div>Frecuencia</div>
+            {isDoctor && <div>Repeticiones</div>}
+            <div>{isDoctor ? "Fecha" : "Repeticiones"}</div>
           </div>
 
           {prescriptions.map((rx, i) => (
             <div
               key={rx.id}
-              className="grid grid-cols-12 gap-4 px-5 py-4 items-center transition-colors"
+              className="grid gap-4 px-5 py-4 items-center transition-colors"
               style={{
-                borderBottom: i < prescriptions.length - 1 ? `1px solid ${C.border}` : "none",
+                gridTemplateColumns: isDoctor ? "2fr 2fr 1fr 1fr 1fr" : "3fr 2fr 1fr 1.5fr",
+                borderBottom: i < prescriptions.length - 1 ? "1px solid #E2E8F0" : "none",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = C.surfaceHover; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#F8FAFC"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
             >
-              <div className="col-span-4 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EDE9FE" }}>
-                  <Pill size={16} color="#7C3AED" />
+              {isDoctor && (
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: "#CCFBF1", color: "#0F766E" }}>
+                    {(rx.patient_name || "P").charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium truncate" style={{ color: "#0F172A" }}>{rx.patient_name}</span>
                 </div>
-                <span className="text-sm font-semibold" style={{ color: C.text }}>{rx.medication}</span>
+              )}
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EDE9FE" }}>
+                  <Pill size={14} color="#7C3AED" />
+                </div>
+                <span className="text-sm font-semibold" style={{ color: "#0F172A" }}>{rx.medication}</span>
               </div>
-              <div className="col-span-3 text-sm" style={{ color: C.textSecondary }}>{rx.frequency}</div>
-              <div className="col-span-2">
-                <span className="inline-flex text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: C.brandLight, color: C.brand }}>
+              <div className="text-sm" style={{ color: "#64748B" }}>{rx.frequency}</div>
+              <div>
+                <span className="inline-flex text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "#CCFBF1", color: "#0F766E" }}>
                   {rx.refills}x
                 </span>
               </div>
-              <div className="col-span-3 text-sm" style={{ color: C.textSecondary }}>{rx.date}</div>
+              <div className="text-sm" style={{ color: "#64748B" }}>{rx.date}</div>
             </div>
           ))}
         </div>
@@ -109,5 +149,3 @@ export function ScreenRecetas({
     </div>
   );
 }
-
-// no local C - uses imported C from types

@@ -7,8 +7,11 @@ export type Screen =
   | "form-step3"
   | "confirmacion"
   | "recetas"
+  | "crear-receta"
   | "asistencia"
   | "soporte";
+
+export type UserRole = "patient" | "doctor";
 
 export interface Booking {
   type: string | null;
@@ -30,6 +33,15 @@ export interface Prescription {
   frequency: string;
   refills: number;
   date: string;
+  doctor_id?: number;
+  patient_id?: number;
+  patient_name?: string;
+}
+
+export interface Patient {
+  id: number;
+  full_name: string;
+  email: string;
 }
 
 export interface HomeService {

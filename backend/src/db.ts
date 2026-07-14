@@ -14,8 +14,11 @@ export async function initDB() {
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
         full_name TEXT NOT NULL,
+        role TEXT DEFAULT 'patient',
         created_at TIMESTAMPTZ DEFAULT now()
       );
+
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'patient';
 
       CREATE TABLE IF NOT EXISTS appointments (
         id SERIAL PRIMARY KEY,
@@ -30,11 +33,14 @@ export async function initDB() {
       CREATE TABLE IF NOT EXISTS prescriptions (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        doctor_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         medication TEXT NOT NULL,
         frequency TEXT NOT NULL,
         refills INTEGER DEFAULT 0,
         date TEXT NOT NULL
       );
+
+      ALTER TABLE prescriptions ADD COLUMN IF NOT EXISTS doctor_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
 
       CREATE TABLE IF NOT EXISTS home_services (
         id SERIAL PRIMARY KEY,

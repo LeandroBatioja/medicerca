@@ -6,14 +6,23 @@ import {
   Headphones,
   LogOut,
   Activity,
+  FileText,
+  Stethoscope,
 } from "lucide-react";
-import type { Screen } from "../types";
+import type { Screen, UserRole } from "../types";
 
-const navItems: { id: Screen; label: string; icon: typeof LayoutDashboard }[] = [
+const patientNav: { id: Screen; label: string; icon: typeof LayoutDashboard }[] = [
   { id: "inicio", label: "Dashboard", icon: LayoutDashboard },
   { id: "form-step1", label: "Agendar cita", icon: CalendarCheck },
   { id: "recetas", label: "Mis recetas", icon: Pill },
   { id: "asistencia", label: "Servicios", icon: Ambulance },
+  { id: "soporte", label: "Soporte", icon: Headphones },
+];
+
+const doctorNav: { id: Screen; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: "inicio", label: "Dashboard", icon: LayoutDashboard },
+  { id: "crear-receta", label: "Crear receta", icon: FileText },
+  { id: "recetas", label: "Mis recetas", icon: Pill },
   { id: "soporte", label: "Soporte", icon: Headphones },
 ];
 
@@ -22,12 +31,16 @@ export function Sidebar({
   onNavigate,
   onLogout,
   userName,
+  userRole,
 }: {
   current: Screen;
   onNavigate: (s: Screen) => void;
   onLogout: () => void;
   userName: string;
+  userRole: UserRole;
 }) {
+  const navItems = userRole === "doctor" ? doctorNav : patientNav;
+
   return (
     <aside
       className="hidden lg:flex flex-col w-64 shrink-0 h-screen sticky top-0 border-r"
@@ -35,18 +48,26 @@ export function Sidebar({
     >
       {/* Brand */}
       <div className="flex items-center gap-3 px-6 py-5 border-b" style={{ borderColor: C.border }}>
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: C.brandLight }}
-        >
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: C.brandLight }}>
           <Activity size={18} color={C.brand} strokeWidth={2.5} />
         </div>
-        <span
-          className="text-lg font-bold tracking-tight"
-          style={{ color: C.text, fontFamily: "'Lora', serif" }}
-        >
+        <span className="text-lg font-bold tracking-tight" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
           MediCerca
         </span>
+      </div>
+
+      {/* Role badge */}
+      <div className="px-6 py-3 border-b" style={{ borderColor: C.border }}>
+        <div
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+          style={{
+            background: userRole === "doctor" ? "#EDE9FE" : C.brandLight,
+            color: userRole === "doctor" ? "#7C3AED" : C.brand,
+          }}
+        >
+          {userRole === "doctor" ? <Stethoscope size={12} /> : <Activity size={12} />}
+          {userRole === "doctor" ? "Medico" : "Paciente"}
+        </div>
       </div>
 
       {/* Nav */}
@@ -73,15 +94,12 @@ export function Sidebar({
       {/* User + Logout */}
       <div className="px-3 py-4 border-t" style={{ borderColor: C.border }}>
         <div className="flex items-center gap-3 px-3 mb-3">
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
-            style={{ background: C.brandLight, color: C.brand }}
-          >
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: C.brandLight, color: C.brand }}>
             {userName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: C.text }}>{userName}</p>
-            <p className="text-xs truncate" style={{ color: C.textMuted }}>Paciente</p>
+            <p className="text-xs truncate" style={{ color: C.textMuted }}>{userRole === "doctor" ? "Medico" : "Paciente"}</p>
           </div>
         </div>
         <button

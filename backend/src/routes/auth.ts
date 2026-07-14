@@ -6,7 +6,7 @@ import { signToken } from "../middleware/auth.js";
 const router = Router();
 
 router.post("/register", async (req, res) => {
-  const { email, password, fullName } = req.body;
+  const { email, password, fullName, role } = req.body;
 
   if (!email || !password || !fullName) {
     res.status(400).json({ error: "Faltan campos: email, password, fullName" });
@@ -18,6 +18,8 @@ router.post("/register", async (req, res) => {
     return;
   }
 
+  const userRole = role === "doctor" ? "doctor" : "patient";
+
   try {
     const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
     if (existing.rows.length > 0) {
@@ -27,8 +29,8 @@ router.post("/register", async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      "INSERT INTO users (email, password_hash, full_name) VALUES ($1, $2, $3) RETURNING id, email, full_name",
-      [email, passwordHash, fullName]
+      "INSERT INTO users (email, password_hash, full_name, role) VALUES ($1, $2, $3, $4) RETURNING id, email, full_name, role",
+      [email, passwordHash, fullName, userRole]
     );
 
     const user = result.rows[0];
@@ -36,7 +38,7 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({
       token,
-      user: { id: user.id, email: user.email, fullName: user.full_name },
+      user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role },
     });
   } catch (err) {
     console.error("Register error:", err);
@@ -54,7 +56,7 @@ router.post("/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT id, email, password_hash, full_name FROM users WHERE email = $1",
+      "SELECT id, email, password_hash, full_name, role FROM users WHERE email = $1",
       [email]
     );
 
@@ -74,7 +76,7 @@ router.post("/login", async (req, res) => {
     const token = signToken(user.id);
     res.json({
       token,
-      user: { id: user.id, email: user.email, fullName: user.full_name },
+      user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role },
     });
   } catch (err) {
     console.error("Login error:", err);
