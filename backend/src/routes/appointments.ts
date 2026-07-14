@@ -41,11 +41,12 @@ router.get("/", async (req: AuthRequest, res) => {
 router.get("/doctor", async (req: AuthRequest, res) => {
   try {
     const result = await pool.query(
-      `SELECT a.id, a.type, a.slot_id, a.doctor, a.clinic, a.date, a.time, a.confirmed_at, a.user_id,
+      `SELECT a.id, a.type, a.slot_id, a.doctor, a.clinic, a.date, a.time, a.confirmed_at, a.user_id, a.doctor_id,
               u.full_name as patient_name, u.email as patient_email
        FROM appointments a
        JOIN users u ON u.id = a.user_id
        WHERE a.doctor_id = $1
+          OR (a.doctor_id IS NULL AND LOWER(a.doctor) = LOWER((SELECT full_name FROM users WHERE id = $1)))
        ORDER BY a.confirmed_at DESC`,
       [req.userId]
     );
@@ -59,7 +60,7 @@ router.get("/doctor", async (req: AuthRequest, res) => {
 router.delete("/:id", async (req: AuthRequest, res) => {
   try {
     const result = await pool.query(
-      "DELETE FROM appointments WHERE id = $1 AND user_id = $2",
+      "DELETE FROM appointments WHERE id = $1 AND (user_id = $2 OR doctor_id = $2)",
       [req.params.id, req.userId]
     );
     if (result.rowCount === 0) {

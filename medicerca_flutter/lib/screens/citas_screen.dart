@@ -236,18 +236,86 @@ class _CitasScreenState extends State<CitasScreen> {
                   value: appointment.patientName!),
             ],
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 44,
-              child: OutlinedButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cerrar'),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 44,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Cerrar'),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  height: 44,
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (d) => AlertDialog(
+                          title: const Text('Eliminar cita'),
+                          content: const Text('Seguro que quieres eliminar esta cita?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(d, false),
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(d, true),
+                              child: const Text('Eliminar',
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true && context.mounted) {
+                        Navigator.pop(ctx);
+                        await _deleteAppointment(appointment);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.red),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    child: const Icon(Icons.delete_outline,
+                        color: Colors.red, size: 20),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _deleteAppointment(Appointment appointment) async {
+    try {
+      final appState = context.read<AppState>();
+      await appState.api.deleteAppointment(appointment.id);
+      if (mounted) {
+        setState(() {
+          _appointments.removeWhere((a) => a.id == appointment.id);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cita eliminada'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 

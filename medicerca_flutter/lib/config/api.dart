@@ -113,6 +113,14 @@ class ApiClient {
     return body;
   }
 
+  Future<void> deleteAppointment(int id) async {
+    final res = await http.delete(
+      Uri.parse('$baseUrl/api/appointments/$id'),
+      headers: _headers,
+    );
+    await _handleResponse(res);
+  }
+
   // Prescriptions
   Future<List<Prescription>> getPrescriptions() async {
     final res = await _get('/api/prescriptions');

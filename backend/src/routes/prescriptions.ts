@@ -45,8 +45,8 @@ router.get("/patients", async (req: AuthRequest, res) => {
     const result = await pool.query(
       `SELECT DISTINCT u.id, u.full_name, u.email
        FROM users u
-       JOIN prescriptions p ON p.user_id = u.id
-       WHERE p.doctor_id = $1 AND u.role = 'patient'
+       JOIN appointments a ON a.user_id = u.id
+       WHERE a.doctor_id = $1 AND u.role = 'patient'
        ORDER BY u.full_name`,
       [req.userId]
     );
