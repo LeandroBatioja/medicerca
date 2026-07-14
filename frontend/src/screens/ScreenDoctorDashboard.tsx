@@ -47,18 +47,18 @@ export function ScreenDoctorDashboard({
 
   return (
     <div className="min-h-screen" style={{ background: "#F8FAFC" }}>
-      <div className="max-w-7xl mx-auto" style={{ padding: "48px 48px" }}>
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-8 sm:py-12 lg:px-12 lg:py-12">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-14">
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <GreetingIcon size={20} color="#D97706" />
-              <p className="text-sm font-medium" style={{ color: "#64748B" }}>{greeting.text}</p>
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <GreetingIcon size={18} color="#D97706" />
+              <p className="text-xs sm:text-sm font-medium" style={{ color: "#64748B" }}>{greeting.text}</p>
             </div>
-            <h1 className="mb-2" style={{ color: "#0F172A", fontFamily: "'Lora', serif", fontSize: 36, fontWeight: 700 }}>
+            <h1 className="mb-1 sm:mb-2" style={{ color: "#0F172A", fontFamily: "'Lora', serif", fontSize: window.innerWidth < 640 ? 28 : 36, fontWeight: 700 }}>
               Dr(a). {userName}
             </h1>
-            <p className="text-base" style={{ color: "#94A3B8" }}>{getFormattedDate()}</p>
+            <p className="text-sm sm:text-base" style={{ color: "#94A3B8" }}>{getFormattedDate()}</p>
           </div>
 
           <button
@@ -72,25 +72,25 @@ export function ScreenDoctorDashboard({
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-14">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 mb-8 sm:mb-14">
           {stats.map((s) => (
-            <div key={s.label} className="p-6 rounded-2xl border" style={{ background: "#FFFFFF", borderColor: "#E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-              <div className="flex items-center justify-between mb-5">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: s.bg }}>
-                  <s.icon size={22} color={s.color} />
+            <div key={s.label} className="p-4 sm:p-6 rounded-2xl border" style={{ background: "#FFFFFF", borderColor: "#E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+              <div className="flex items-center justify-between mb-3 sm:mb-5">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center" style={{ background: s.bg }}>
+                  <s.icon size={20} color={s.color} />
                 </div>
-                <TrendingUp size={16} color="#94A3B8" />
+                <TrendingUp size={14} color="#94A3B8" />
               </div>
-              <p style={{ color: "#0F172A", fontSize: 32, fontWeight: 700, lineHeight: 1 }} className="mb-1">{s.value}</p>
-              <p className="text-sm font-medium mb-1" style={{ color: "#0F172A" }}>{s.label}</p>
-              <p className="text-xs" style={{ color: "#94A3B8" }}>{s.change}</p>
+              <p style={{ color: "#0F172A", fontSize: window.innerWidth < 640 ? 24 : 32, fontWeight: 700, lineHeight: 1 }} className="mb-1">{s.value}</p>
+              <p className="text-xs sm:text-sm font-medium mb-0.5 sm:mb-1" style={{ color: "#0F172A" }}>{s.label}</p>
+              <p className="text-[10px] sm:text-xs" style={{ color: "#94A3B8" }}>{s.change}</p>
             </div>
           ))}
         </div>
 
         {/* Quick actions */}
-        <h2 className="text-xl font-bold mb-5" style={{ color: "#0F172A" }}>Acciones rapidas</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
+        <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-5" style={{ color: "#0F172A" }}>Acciones rapidas</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mb-8 sm:mb-12">
           {[
             { id: "crear-receta" as Screen, label: "Crear receta", desc: "Escribe una nueva receta medica para un paciente", icon: FileText, color: "#7C3AED", bg: "#EDE9FE" },
             { id: "recetas" as Screen, label: "Ver recetas", desc: "Consulta las recetas que has creado", icon: Pill, color: "#0F766E", bg: "#CCFBF1" },
@@ -99,28 +99,28 @@ export function ScreenDoctorDashboard({
             <button
               key={a.id}
               onClick={() => onNavigate(a.id)}
-              className="flex flex-col items-start gap-4 p-6 rounded-2xl border text-left transition-all duration-200 cursor-pointer group"
+              className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-4 p-4 sm:p-6 rounded-2xl border text-left transition-all duration-200 cursor-pointer group"
               style={{ background: "#FFFFFF", borderColor: "#E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
               onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "none"; }}
             >
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: a.bg }}>
-                <a.icon size={22} color={a.color} />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: a.bg }}>
+                <a.icon size={18} color={a.color} />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[15px] font-semibold mb-1" style={{ color: "#0F172A" }}>{a.label}</p>
-                <p className="text-sm leading-relaxed" style={{ color: "#64748B" }}>{a.desc}</p>
+              <div className="flex-1 min-w-0 sm:flex-none">
+                <p className="text-sm sm:text-[15px] font-semibold mb-0.5 sm:mb-1" style={{ color: "#0F172A" }}>{a.label}</p>
+                <p className="text-xs sm:text-sm leading-relaxed" style={{ color: "#64748B" }}>{a.desc}</p>
               </div>
-              <ArrowRight size={18} color="#94A3B8" className="shrink-0 transition-transform group-hover:translate-x-1" />
+              <ArrowRight size={18} color="#94A3B8" className="shrink-0 transition-transform group-hover:translate-x-1 hidden sm:block" />
             </button>
           ))}
         </div>
 
         {/* Activity */}
-        <div className="p-6 rounded-2xl border" style={{ background: "#FFFFFF", borderColor: "#E2E8F0" }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Clock size={18} color="#64748B" />
-            <h3 className="text-base font-bold" style={{ color: "#0F172A" }}>Actividad reciente</h3>
+        <div className="p-4 sm:p-6 rounded-2xl border" style={{ background: "#FFFFFF", borderColor: "#E2E8F0" }}>
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <Clock size={16} color="#64748B" />
+            <h3 className="text-sm sm:text-base font-bold" style={{ color: "#0F172A" }}>Actividad reciente</h3>
           </div>
           <div className="space-y-3">
             {[

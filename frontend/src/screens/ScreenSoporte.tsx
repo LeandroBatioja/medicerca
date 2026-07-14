@@ -33,38 +33,38 @@ export function ScreenSoporte({
   const [expanded, setExpanded] = useState<number | null>(null);
 
   return (
-    <div className="p-6 lg:p-10 max-w-4xl mx-auto">
+    <div className="px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-10 max-w-4xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
+      <div className="hidden sm:flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
         <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: C.brand }}>Inicio</button>
         <span>/</span>
         <span style={{ color: C.text }}>Soporte</span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
         Centro de soporte
       </h1>
-      <p className="text-base mb-8" style={{ color: C.textSecondary }}>
+      <p className="text-sm sm:text-base mb-6 sm:mb-8" style={{ color: C.textSecondary }}>
         Encuentra respuestas a tus preguntas
       </p>
 
       {/* Hero card */}
       <div
-        className="flex items-center gap-4 p-6 rounded-2xl mb-8"
+        className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 rounded-2xl mb-6 sm:mb-8"
         style={{ background: "linear-gradient(135deg, #CCFBF1 0%, #E0F2FE 100%)", border: `1px solid ${C.border}` }}
       >
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.7)" }}>
-          <Headphones size={26} color={C.brand} />
+        <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.7)" }}>
+          <Headphones size={22} color={C.brand} />
         </div>
         <div>
-          <h3 className="text-lg font-semibold" style={{ color: C.text }}>Como podemos ayudarte?</h3>
-          <p className="text-sm" style={{ color: C.textSecondary }}>Busca en nuestras preguntas frecuentes o contacta directamente con nuestro equipo.</p>
+          <h3 className="text-base sm:text-lg font-semibold" style={{ color: C.text }}>Como podemos ayudarte?</h3>
+          <p className="text-xs sm:text-sm" style={{ color: C.textSecondary }}>Busca en nuestras preguntas frecuentes o contacta directamente con nuestro equipo.</p>
         </div>
       </div>
 
       {/* FAQ */}
-      <h2 className="text-base font-bold mb-4" style={{ color: C.text }}>Preguntas frecuentes</h2>
-      <div className="space-y-2 mb-10">
+      <h2 className="text-sm sm:text-base font-bold mb-3 sm:mb-4" style={{ color: C.text }}>Preguntas frecuentes</h2>
+      <div className="space-y-2 mb-8 sm:mb-10">
         {faqs.map((f, i) => {
           const isOpen = expanded === i;
           return (
@@ -79,7 +79,7 @@ export function ScreenSoporte({
             >
               <button
                 onClick={() => setExpanded(isOpen ? null : i)}
-                className="w-full flex items-center justify-between px-5 py-4 cursor-pointer"
+                className="w-full flex items-center justify-between px-4 sm:px-5 py-3.5 sm:py-4 cursor-pointer"
               >
                 <span className="text-sm font-semibold text-left pr-4" style={{ color: isOpen ? C.brand : C.text }}>
                   {f.q}
@@ -91,7 +91,7 @@ export function ScreenSoporte({
                 )}
               </button>
               {isOpen && (
-                <div className="px-5 pb-4">
+                <div className="px-4 sm:px-5 pb-4">
                   <p className="text-sm leading-relaxed" style={{ color: C.textSecondary }}>{f.a}</p>
                 </div>
               )}
@@ -101,8 +101,8 @@ export function ScreenSoporte({
       </div>
 
       {/* Contact */}
-      <h2 className="text-base font-bold mb-4" style={{ color: C.text }}>Contacto directo</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <h2 className="text-sm sm:text-base font-bold mb-3 sm:mb-4" style={{ color: C.text }}>Contacto directo</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
         {[
           { icon: Phone, label: "Telefono", value: "+56 9 1234 5678", color: C.brand },
           { icon: Mail, label: "Email", value: "soporte@medicerca.cl", color: "#7C3AED" },
@@ -110,15 +110,15 @@ export function ScreenSoporte({
         ].map((c, i) => (
           <div
             key={i}
-            className="flex items-start gap-3 p-4 rounded-xl border transition-all duration-200"
+            className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border transition-all duration-200"
             style={{ background: C.surface, borderColor: C.border, boxShadow: C.shadow }}
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${c.color}10` }}>
-              <c.icon size={18} color={c.color} />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${c.color}10` }}>
+              <c.icon size={16} color={c.color} />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium" style={{ color: C.textMuted }}>{c.label}</p>
-              <p className="text-sm font-semibold" style={{ color: C.text }}>{c.value}</p>
+              <p className="text-[10px] sm:text-xs font-medium" style={{ color: C.textMuted }}>{c.label}</p>
+              <p className="text-xs sm:text-sm font-semibold" style={{ color: C.text }}>{c.value}</p>
             </div>
           </div>
         ))}

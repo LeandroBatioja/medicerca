@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { C, type Screen, type Booking, type UserRole } from "./types";
 import { api } from "./api";
 import { Sidebar } from "./components/Sidebar";
+import { MobileTabBar } from "./components/MobileTabBar";
 
 import { ScreenLogin } from "./screens/ScreenLogin";
 import { ScreenRegistro } from "./screens/ScreenRegistro";
@@ -110,10 +111,13 @@ function AppContent() {
 
   return (
     <div className="flex min-h-screen" style={{ background: C.bg }}>
-      <Sidebar current={current} onNavigate={push} onLogout={handleLogout} userName={userName} userRole={userRole} />
-      <main className="flex-1 min-w-0">
+      <div className="hidden lg:block">
+        <Sidebar current={current} onNavigate={push} onLogout={handleLogout} userName={userName} userRole={userRole} />
+      </div>
+      <main className="flex-1 min-w-0 pb-20 lg:pb-0">
         {renderScreen()}
       </main>
+      <MobileTabBar current={current} onNavigate={push} userRole={userRole} />
     </div>
   );
 }

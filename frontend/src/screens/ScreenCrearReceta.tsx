@@ -96,22 +96,22 @@ export function ScreenCrearReceta({
   };
 
   return (
-    <div className="p-6 lg:p-10 max-w-4xl mx-auto">
+    <div className="px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-10 max-w-4xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: "#64748B" }}>
+      <div className="hidden sm:flex items-center gap-2 text-sm mb-6" style={{ color: "#64748B" }}>
         <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: "#0F766E" }}>Dashboard</button>
         <span>/</span>
         <span style={{ color: "#0F172A" }}>Crear receta</span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2" style={{ color: "#0F172A", fontFamily: "'Lora', serif" }}>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: "#0F172A", fontFamily: "'Lora', serif" }}>
         Crear receta medica
       </h1>
-      <p className="text-base mb-10" style={{ color: "#64748B" }}>
+      <p className="text-sm sm:text-base mb-6 sm:mb-10" style={{ color: "#64748B" }}>
         Completa los datos para crear una nueva receta
       </p>
 
-      <div className="p-7 rounded-2xl" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+      <div className="p-5 sm:p-7 rounded-2xl" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
         <div className="space-y-5 mb-7">
           {/* Patient select */}
           <div>
@@ -192,10 +192,10 @@ export function ScreenCrearReceta({
           </div>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => onNavigate("inicio")}
-            className="h-12 px-6 rounded-xl border font-medium text-[15px] flex items-center gap-2 cursor-pointer"
+            className="h-12 px-6 rounded-xl border font-medium text-[15px] flex items-center justify-center gap-2 cursor-pointer"
             style={{ borderColor: "#E2E8F0", color: "#64748B", background: "#FFFFFF" }}
           >
             <ArrowLeft size={18} /> Cancelar
@@ -203,7 +203,7 @@ export function ScreenCrearReceta({
           <button
             onClick={handleSubmit}
             disabled={!isValid || loading}
-            className="h-12 px-8 rounded-xl font-semibold text-[15px] flex items-center gap-2 cursor-pointer"
+            className="h-12 px-8 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 cursor-pointer"
             style={{
               background: isValid ? "#7C3AED" : "#CBD5E1",
               color: isValid ? "#fff" : "#64748B",

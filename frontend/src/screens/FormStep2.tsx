@@ -39,9 +39,9 @@ export function FormStep2({
   onNavigate: (s: Screen) => void;
 }) {
   return (
-    <div className="p-6 lg:p-10 max-w-4xl mx-auto">
+    <div className="px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-10 max-w-4xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
+      <div className="hidden sm:flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
         <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: C.brand }}>Inicio</button>
         <span>/</span>
         <button onClick={() => onNavigate("form-step1")} className="cursor-pointer hover:underline" style={{ color: C.brand }}>Agendar cita</button>
@@ -49,20 +49,20 @@ export function FormStep2({
         <span style={{ color: C.text }}>Fecha y hora</span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
         Seleccionar fecha y hora
       </h1>
-      <p className="text-base mb-8" style={{ color: C.textSecondary }}>
+      <p className="text-sm sm:text-base mb-6 sm:mb-8" style={{ color: C.textSecondary }}>
         Elige el dia y horario que mejor se adapte a ti
       </p>
 
       {/* Progress */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
         {["Tipo", "Fecha", "Confirmar"].map((s, i) => (
-          <div key={s} className="flex items-center gap-3 flex-1">
-            <div className="flex items-center gap-2">
+          <div key={s} className="flex items-center gap-2 sm:gap-3 flex-1">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold"
                 style={{
                   background: i <= 1 ? C.brand : C.surface,
                   color: i <= 1 ? "#fff" : C.textMuted,
@@ -71,7 +71,7 @@ export function FormStep2({
               >
                 {i + 1}
               </div>
-              <span className="text-sm font-medium" style={{ color: i <= 1 ? C.text : C.textMuted }}>{s}</span>
+              <span className="text-xs sm:text-sm font-medium hidden sm:inline" style={{ color: i <= 1 ? C.text : C.textMuted }}>{s}</span>
             </div>
             {i < 2 && <div className="flex-1 h-px" style={{ background: i <= 0 ? C.brand : C.border }} />}
           </div>
@@ -79,34 +79,34 @@ export function FormStep2({
       </div>
 
       {/* Date grid */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar size={18} color={C.brand} />
-          <h3 className="text-base font-semibold" style={{ color: C.text }}>Selecciona un dia</h3>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Calendar size={16} color={C.brand} />
+          <h3 className="text-sm sm:text-base font-semibold" style={{ color: C.text }}>Selecciona un dia</h3>
         </div>
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-3">
           {days.map((d) => {
             const selected = booking.slot?.startsWith(d.value);
             return (
               <button
                 key={d.value}
                 onClick={() => setBooking((prev) => ({ ...prev, slot: `${d.value}_` }))}
-                className="flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200 cursor-pointer"
+                className="flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border transition-all duration-200 cursor-pointer"
                 style={{
-                  minHeight: 72,
+                  minHeight: window.innerWidth < 640 ? 52 : 72,
                   borderColor: selected ? C.brand : C.border,
                   background: selected ? C.brandLight : C.surface,
                   boxShadow: selected ? `0 0 0 1px ${C.brand}` : C.shadow,
                 }}
               >
-                <span className="text-xs font-medium capitalize" style={{ color: selected ? C.brand : C.textSecondary }}>
+                <span className="text-[9px] sm:text-xs font-medium capitalize" style={{ color: selected ? C.brand : C.textSecondary }}>
                   {d.label.split(" ")[0]}
                 </span>
-                <span className="text-xl font-bold" style={{ color: selected ? C.brand : C.text }}>
+                <span className="text-sm sm:text-xl font-bold" style={{ color: selected ? C.brand : C.text }}>
                   {d.label.split(" ")[1]}
                 </span>
                 {d.isToday && (
-                  <span className="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: C.brand }}>
+                  <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: C.brand }}>
                     Hoy
                   </span>
                 )}
@@ -118,11 +118,11 @@ export function FormStep2({
 
       {/* Time slots */}
       {booking.slot && (
-        <div className="mb-8">
-          <h3 className="text-base font-semibold mb-4" style={{ color: C.text }}>Selecciona un horario</h3>
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-sm sm:text-base font-semibold mb-3 sm:mb-4" style={{ color: C.text }}>Selecciona un horario</h3>
 
-          <p className="text-sm font-medium mb-2" style={{ color: C.textSecondary }}>Manana</p>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mb-6">
+          <p className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2" style={{ color: C.textSecondary }}>Manana</p>
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2 mb-4 sm:mb-6">
             {slots.filter((s) => s.period === "manana").map((s) => {
               const selected = booking.slot?.endsWith(s.id);
               return (
@@ -132,7 +132,7 @@ export function FormStep2({
                     const datePart = booking.slot?.split("_")[0];
                     setBooking((prev) => ({ ...prev, slot: `${datePart}_${s.id}` }));
                   }}
-                  className="h-10 rounded-lg border flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer"
+                  className="h-9 sm:h-10 rounded-lg border flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer"
                   style={{
                     borderColor: selected ? C.brand : C.border,
                     background: selected ? C.brand : C.surface,
@@ -146,8 +146,8 @@ export function FormStep2({
             })}
           </div>
 
-          <p className="text-sm font-medium mb-2" style={{ color: C.textSecondary }}>Tarde</p>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mb-6">
+          <p className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2" style={{ color: C.textSecondary }}>Tarde</p>
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2 mb-4 sm:mb-6">
             {slots.filter((s) => s.period === "tarde").map((s) => {
               const selected = booking.slot?.endsWith(s.id);
               return (
@@ -157,7 +157,7 @@ export function FormStep2({
                     const datePart = booking.slot?.split("_")[0];
                     setBooking((prev) => ({ ...prev, slot: `${datePart}_${s.id}` }));
                   }}
-                  className="h-10 rounded-lg border flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer"
+                  className="h-9 sm:h-10 rounded-lg border flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer"
                   style={{
                     borderColor: selected ? C.brand : C.border,
                     background: selected ? C.brand : C.surface,
@@ -174,17 +174,17 @@ export function FormStep2({
       )}
 
       {/* Footer */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={() => onNavigate("form-step1")}
-          className="h-12 px-6 rounded-xl border font-medium text-[15px] flex items-center gap-2 transition-all duration-200 cursor-pointer"
+          className="h-12 px-6 rounded-xl border font-medium text-[15px] flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
           style={{ borderColor: C.border, color: C.textSecondary, background: C.surface }}
         >
           <ArrowLeft size={18} /> Atras
         </button>
         <button
           onClick={() => onNavigate("form-step3")}
-          className="h-12 px-8 rounded-xl font-semibold text-[15px] flex items-center gap-2 transition-all duration-200 cursor-pointer"
+          className="h-12 px-8 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
           style={{
             background: booking.slot && booking.slot.includes("_") ? C.brand : C.disabled,
             color: booking.slot && booking.slot.includes("_") ? "#fff" : C.textSecondary,

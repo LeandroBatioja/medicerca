@@ -28,18 +28,18 @@ export function ScreenAsistencia({
   }, []);
 
   return (
-    <div className="p-6 lg:p-10 max-w-4xl mx-auto">
+    <div className="px-4 py-5 sm:px-8 sm:py-8 lg:px-10 lg:py-10 max-w-4xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
+      <div className="hidden sm:flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
         <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: C.brand }}>Inicio</button>
         <span>/</span>
         <span style={{ color: C.text }}>Servicios a domicilio</span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
         Servicios a domicilio
       </h1>
-      <p className="text-base mb-8" style={{ color: C.textSecondary }}>
+      <p className="text-sm sm:text-base mb-6 sm:mb-8" style={{ color: C.textSecondary }}>
         Servicios medicos disponibles en tu zona
       </p>
 
@@ -67,31 +67,29 @@ export function ScreenAsistencia({
           <p className="text-sm" style={{ color: C.textSecondary }}>No tienes servicios a domicilio agendados actualmente.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {services.map((svc) => {
             const statusColor = svc.status === "completado" ? C.success : svc.status === "pendiente" ? C.warning : C.brand;
             const statusBg = svc.status === "completado" ? C.successLight : svc.status === "pendiente" ? C.warningLight : C.brandLight;
             return (
               <div
                 key={svc.id}
-                className="flex items-start gap-4 p-5 rounded-2xl border transition-all duration-200"
+                className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border transition-all duration-200"
                 style={{ background: C.surface, borderColor: C.border, boxShadow: C.shadow }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = C.shadowMd; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = C.shadow; }}
               >
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: statusBg }}>
-                  <Ambulance size={20} color={statusColor} />
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: statusBg }}>
+                  <Ambulance size={18} color={statusColor} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-0.5 sm:mb-1">
                     <p className="text-sm font-semibold" style={{ color: C.text }}>{svc.service_type}</p>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: statusBg, color: statusColor }}>
+                    <span className="text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full" style={{ background: statusBg, color: statusColor }}>
                       {svc.status}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
-                    <MapPin size={13} color={C.textMuted} />
-                    <p className="text-sm" style={{ color: C.textSecondary }}>{svc.address}</p>
+                    <MapPin size={12} color={C.textMuted} />
+                    <p className="text-xs sm:text-sm" style={{ color: C.textSecondary }}>{svc.address}</p>
                   </div>
                 </div>
               </div>
