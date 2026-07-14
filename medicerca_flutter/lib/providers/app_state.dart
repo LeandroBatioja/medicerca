@@ -58,7 +58,7 @@ class AppState extends ChangeNotifier {
     } on ApiException catch (e) {
       return e.message;
     } catch (e) {
-      return 'Error de conexion';
+      return 'Error: $e';
     } finally {
       _setLoading(false);
     }
@@ -79,7 +79,7 @@ class AppState extends ChangeNotifier {
     } on ApiException catch (e) {
       return e.message;
     } catch (e) {
-      return 'Error de conexion';
+      return 'Error: $e';
     } finally {
       _setLoading(false);
     }
