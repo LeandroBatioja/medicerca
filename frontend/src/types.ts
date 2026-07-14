@@ -40,26 +40,40 @@ export interface HomeService {
   created_at: string;
 }
 
-export const COLORS = {
-  accentBg: "#E6F1FB",
-  accentText: "#185FA5",
-  accentHover: "#145088",
-  successBg: "#EAF3DE",
-  successText: "#3B6D11",
-  warningBg: "#FFF8E6",
-  warningText: "#7A5400",
-  warningIcon: "#B07A00",
-  errorBg: "#FFF0F0",
-  errorBorder: "#FFCDD2",
-  errorText: "#C62828",
-  secondary: "#5F5E5A",
-  disabled: "#D5DFE8",
-  fg: "#1A1C20",
-  surface: "#ffffff",
-  bg: "#F4F7FB",
-  border: "rgba(24,95,165,0.12)",
-  borderHover: "rgba(24,95,165,0.25)",
-  shadow: "0 2px 12px rgba(24,95,165,0.08)",
-  shadowMd: "0 4px 20px rgba(24,95,165,0.12)",
-  shadowLg: "0 8px 32px rgba(24,95,165,0.16)",
-};
+export const C = {
+  brand: "#0F766E",
+  brandLight: "#CCFBF1",
+  brandDark: "#115E59",
+  brandAccent: "#14B8A6",
+
+  bg: "#F8FAFC",
+  surface: "#FFFFFF",
+  surfaceHover: "#F1F5F9",
+
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textMuted: "#94A3B8",
+  textInverse: "#FFFFFF",
+
+  border: "#E2E8F0",
+  borderFocus: "#14B8A6",
+
+  success: "#059669",
+  successLight: "#D1FAE5",
+  warning: "#D97706",
+  warningLight: "#FEF3C7",
+  error: "#DC2626",
+  errorLight: "#FEE2E2",
+  info: "#0284C7",
+  infoLight: "#E0F2FE",
+
+  shadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+  shadowMd: "0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05)",
+  shadowLg: "0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04)",
+  shadowXl: "0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04)",
+
+  disabled: "#CBD5E1",
+  radius: "12px",
+  radiusLg: "16px",
+  radiusXl: "24px",
+} as const;

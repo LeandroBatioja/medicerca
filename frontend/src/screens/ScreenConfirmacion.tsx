@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Check, PartyPopper } from "lucide-react";
-import { ActionButton } from "../components/ActionButton";
-import { COLORS, type Screen } from "../types";
+import { Check, PartyPopper, Home } from "lucide-react";
+import { C, type Screen } from "../types";
 
 export function ScreenConfirmacion({
   onNavigate,
@@ -17,56 +16,50 @@ export function ScreenConfirmacion({
   }, []);
 
   return (
-    <div
-      className="flex flex-col items-center justify-center px-4 min-h-screen max-w-md mx-auto w-full"
-      style={{
-        background: "linear-gradient(180deg, #EAF3DE 0%, #F4F7FB 60%, #F4F7FB 100%)",
-      }}
-    >
-      {/* Animated check */}
-      <div
-        className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-all duration-500 ${show ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
-        style={{
-          background: "linear-gradient(135deg, #3B6D11 0%, #4A8A15 100%)",
-          boxShadow: "0 8px 32px rgba(59,109,17,0.3)",
-        }}
-      >
-        <Check size={48} strokeWidth={3} color="#fff" />
-      </div>
+    <div className="flex items-center justify-center min-h-[80vh] p-6">
+      <div className="text-center max-w-md">
+        <div
+          className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 transition-all duration-500 ${show ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
+          style={{ background: C.successLight, boxShadow: "0 8px 32px rgba(5,150,105,0.2)" }}
+        >
+          <Check size={44} strokeWidth={3} color={C.success} />
+        </div>
 
-      {/* Confetti icon */}
-      <div
-        className={`transition-all duration-700 delay-200 ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
-      >
-        <PartyPopper size={28} color={COLORS.warningIcon} />
-      </div>
+        <div
+          className={`transition-all duration-700 delay-200 ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+        >
+          <PartyPopper size={28} color={C.warning} className="mx-auto mb-3" />
+        </div>
 
-      <h2
-        className={`text-[26px] font-bold text-center mt-3 mb-2 transition-all duration-500 delay-200 ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
-        style={{ fontFamily: "'Lora', serif", color: COLORS.fg }}
-      >
-        Cita confirmada!
-      </h2>
+        <h2
+          className={`text-3xl font-bold mb-3 transition-all duration-500 delay-200 ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+          style={{ color: C.text, fontFamily: "'Lora', serif" }}
+        >
+          Cita confirmada
+        </h2>
 
-      <p
-        className={`text-[15px] text-center leading-relaxed mb-10 px-6 transition-all duration-500 delay-300 ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
-        style={{ color: COLORS.accentText }}
-      >
-        Hola {userName}, tu cita ha sido agendada exitosamente.
-      </p>
+        <p
+          className={`text-base leading-relaxed mb-8 transition-all duration-500 delay-300 ${show ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+          style={{ color: C.textSecondary }}
+        >
+          Hola {userName}, tu cita ha sido agendada exitosamente. Recibiras un recordatorio antes de tu consulta.
+        </p>
 
-      {/* Actions */}
-      <div
-        className={`w-full transition-all duration-500 delay-500 ${show ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-      >
-        <ActionButton
-          icon={<Check size={20} />}
-          label="Volver al inicio"
-          variant="primary"
-          height={56}
-          onClick={() => onNavigate("inicio")}
-        />
+        <div
+          className={`transition-all duration-500 delay-500 ${show ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+        >
+          <button
+            onClick={() => onNavigate("inicio")}
+            className="h-12 px-8 rounded-xl font-semibold text-[15px] inline-flex items-center gap-2 transition-all duration-200 cursor-pointer"
+            style={{ background: C.brand, color: "#fff" }}
+          >
+            <Home size={18} />
+            Volver al inicio
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
+// no local C - uses imported C from types

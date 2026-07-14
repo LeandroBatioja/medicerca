@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { COLORS, type Screen, type Booking } from "./types";
+import { C, type Screen, type Booking } from "./types";
 import { api } from "./api";
+import { Sidebar } from "./components/Sidebar";
 
 import { ScreenLogin } from "./screens/ScreenLogin";
 import { ScreenRegistro } from "./screens/ScreenRegistro";
@@ -46,6 +47,8 @@ function AppContent() {
     push("confirmacion");
   };
 
+  const isAuth = current !== "login" && current !== "registro";
+
   const renderScreen = () => {
     switch (current) {
       case "login":
@@ -53,7 +56,7 @@ function AppContent() {
       case "registro":
         return <ScreenRegistro onNavigate={push} onBack={pop} />;
       case "inicio":
-        return <ScreenInicio onNavigate={push} userName={userName} onLogout={handleLogout} />;
+        return <ScreenInicio onNavigate={push} userName={userName} />;
       case "form-step1":
         return <FormStep1 booking={booking} setBooking={setBooking} onNavigate={push} />;
       case "form-step2":
@@ -71,31 +74,24 @@ function AppContent() {
     }
   };
 
+  if (!isAuth) {
+    return (
+      <div className="min-h-screen" style={{ background: C.bg }}>
+        {renderScreen()}
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen" style={{ background: COLORS.bg }}>
-      {renderScreen()}
+    <div className="flex min-h-screen" style={{ background: C.bg }}>
+      <Sidebar current={current} onNavigate={push} onLogout={handleLogout} userName={userName} />
+      <main className="flex-1 min-w-0">
+        {renderScreen()}
+      </main>
     </div>
   );
 }
 
 export default function App() {
-  return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: "linear-gradient(145deg, #E8F1FA 0%, #F4F7FB 50%, #EDF5E6 100%)",
-        fontFamily: "'DM Sans', sans-serif",
-      }}
-    >
-      <div className="hidden lg:flex items-center justify-center py-8">
-        <h1
-          className="text-[28px] font-semibold"
-          style={{ fontFamily: "'Lora', serif", color: COLORS.fg }}
-        >
-          MediCerca
-        </h1>
-      </div>
-      <AppContent />
-    </div>
-  );
+  return <AppContent />;
 }

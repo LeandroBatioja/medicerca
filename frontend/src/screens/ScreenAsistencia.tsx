@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Ambulance, AlertCircle, MapPin } from "lucide-react";
-import { ScreenHeader } from "../components/ScreenHeader";
-import { COLORS, type Screen, type HomeService } from "../types";
+import { Ambulance, AlertCircle, MapPin, Home } from "lucide-react";
+import { C, type Screen, type HomeService } from "../types";
 import { api } from "../api";
 
 export function ScreenAsistencia({
@@ -29,94 +28,70 @@ export function ScreenAsistencia({
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen max-w-md mx-auto w-full" style={{ background: COLORS.bg }}>
-      <ScreenHeader title="Servicios a domicilio" onBack={() => onNavigate("inicio")} />
-
-      {/* Info banner */}
-      <div
-        className="mx-4 mb-5 rounded-2xl p-4"
-        style={{ background: COLORS.accentBg }}
-      >
-        <p className="text-[13px] font-semibold" style={{ color: COLORS.accentText }}>
-          Servicios medicos disponibles en tu zona. Contacta para agendar una visita.
-        </p>
+    <div className="p-6 lg:p-10 max-w-4xl mx-auto">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: C.textSecondary }}>
+        <button onClick={() => onNavigate("inicio")} className="cursor-pointer hover:underline" style={{ color: C.brand }}>Inicio</button>
+        <span>/</span>
+        <span style={{ color: C.text }}>Servicios a domicilio</span>
       </div>
 
+      <h1 className="text-2xl font-bold mb-2" style={{ color: C.text, fontFamily: "'Lora', serif" }}>
+        Servicios a domicilio
+      </h1>
+      <p className="text-base mb-8" style={{ color: C.textSecondary }}>
+        Servicios medicos disponibles en tu zona
+      </p>
+
       {loading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-[15px]" style={{ color: COLORS.secondary }}>Cargando...</p>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex items-center gap-3 px-6 py-4 rounded-xl" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: C.border, borderTopColor: C.brand }} />
+            <span className="text-sm font-medium" style={{ color: C.textSecondary }}>Cargando servicios...</span>
+          </div>
         </div>
       ) : error ? (
-        <div className="mx-4 flex items-start gap-2.5 rounded-2xl px-4 py-3"
-          style={{ background: COLORS.errorBg, border: `1px solid ${COLORS.errorBorder}` }}
+        <div
+          className="flex items-start gap-3 rounded-xl px-5 py-4"
+          style={{ background: C.errorLight, border: `1px solid rgba(220,38,38,0.15)` }}
         >
-          <AlertCircle size={16} color={COLORS.errorText} className="mt-0.5 shrink-0" />
-          <p className="text-[13px]" style={{ color: COLORS.errorText }}>{error}</p>
+          <AlertCircle size={18} color={C.error} className="mt-0.5 shrink-0" />
+          <p className="text-sm" style={{ color: C.error }}>{error}</p>
         </div>
       ) : services.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center px-6">
-          <div
-            className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
-            style={{ background: COLORS.accentBg }}
-          >
-            <Ambulance size={32} color={COLORS.accentText} />
+        <div className="flex flex-col items-center justify-center py-20 rounded-2xl border" style={{ background: C.surface, borderColor: C.border }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: C.brandLight }}>
+            <Home size={28} color={C.brand} />
           </div>
-          <p
-            className="text-[18px] font-semibold text-center mb-2"
-            style={{ color: COLORS.fg, fontFamily: "'Lora', serif" }}
-          >
-            Sin servicios activos
-          </p>
-          <p className="text-[14px] text-center" style={{ color: COLORS.secondary }}>
-            No tienes servicios a domicilio agendados actualmente.
-          </p>
+          <p className="text-lg font-semibold mb-1" style={{ color: C.text }}>Sin servicios activos</p>
+          <p className="text-sm" style={{ color: C.textSecondary }}>No tienes servicios a domicilio agendados actualmente.</p>
         </div>
       ) : (
-        <div className="px-4 flex flex-col gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {services.map((svc) => {
-            const statusColor =
-              svc.status === "completado"
-                ? COLORS.successText
-                : svc.status === "pendiente"
-                  ? COLORS.warningText
-                  : COLORS.accentText;
-            const statusBg =
-              svc.status === "completado"
-                ? COLORS.successBg
-                : svc.status === "pendiente"
-                  ? COLORS.warningBg
-                  : COLORS.accentBg;
+            const statusColor = svc.status === "completado" ? C.success : svc.status === "pendiente" ? C.warning : C.brand;
+            const statusBg = svc.status === "completado" ? C.successLight : svc.status === "pendiente" ? C.warningLight : C.brandLight;
             return (
               <div
                 key={svc.id}
-                className="rounded-3xl p-5"
-                style={{ background: COLORS.surface, boxShadow: COLORS.shadow, border: `1px solid ${COLORS.border}` }}
+                className="flex items-start gap-4 p-5 rounded-2xl border transition-all duration-200"
+                style={{ background: C.surface, borderColor: C.border, boxShadow: C.shadow }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = C.shadowMd; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = C.shadow; }}
               >
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ background: statusBg }}
-                  >
-                    <Ambulance size={20} color={statusColor} />
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: statusBg }}>
+                  <Ambulance size={20} color={statusColor} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-semibold" style={{ color: C.text }}>{svc.service_type}</p>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: statusBg, color: statusColor }}>
+                      {svc.status}
+                    </span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-[17px] font-semibold" style={{ color: COLORS.fg }}>
-                        {svc.service_type}
-                      </p>
-                      <span
-                        className="text-[12px] font-semibold px-2.5 py-1 rounded-xl"
-                        style={{ background: statusBg, color: statusColor }}
-                      >
-                        {svc.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <MapPin size={13} color={COLORS.secondary} />
-                      <p className="text-[13px]" style={{ color: COLORS.secondary }}>
-                        {svc.address}
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <MapPin size={13} color={C.textMuted} />
+                    <p className="text-sm" style={{ color: C.textSecondary }}>{svc.address}</p>
                   </div>
                 </div>
               </div>
@@ -127,3 +102,5 @@ export function ScreenAsistencia({
     </div>
   );
 }
+
+// no local C - uses imported C from types
