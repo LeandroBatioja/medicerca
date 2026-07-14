@@ -4,17 +4,19 @@
 
 - **Node.js** >= 18.x
 - **npm** >= 9.x
+- **Flutter** >= 3.41.x + **Dart** >= 3.11.x
+- **Android SDK** (para construir APK)
+- **Java 21** (OpenJDK)
 - **Cuenta en Render** (render.com) — para backend + PostgreSQL
-- **Cuenta en Vercel** (vercel.com) — para frontend
 - **Git** — para push a GitHub
 
 ## 1. Estructura del proyecto
 
 ```
 medicerca/
-├── frontend/    # React + Vite + Tailwind (desplegado en Vercel)
-├── backend/     # Express + PostgreSQL (desplegado en Render)
-└── docs/        # Documentacion
+├── medicerca_flutter/   # Flutter/Dart (APK nativo Android)
+├── backend/             # Express + PostgreSQL (desplegado en Render)
+└── docs/                # Documentacion
 ```
 
 ## 2. Desplegar el Backend en Render
@@ -46,25 +48,68 @@ medicerca/
 
 5. Crear el servicio
 
-### Crear usuario demo
+### Crear usuarios de prueba
 
-Una vez desplegado el backend, crear un usuario via la API:
+Una vez desplegado el backend, crear usuarios via la API:
 
 ```bash
+# Registrar doctor
 curl -X POST https://medicerca-backend.onrender.com/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"demo@medicerca.com","password":"demo123","fullName":"Usuario Demo"}'
+  -d '{"email":"doctor.garcia@medicerca.com","password":"medicerca123","fullName":"Carlos Garcia","role":"doctor"}'
+
+# Registrar paciente
+curl -X POST https://medicerca-backend.onrender.com/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"maria@test.com","password":"medicerca123","fullName":"Maria Lopez","role":"patient"}'
 ```
 
-## 3. Desplegar el Frontend en Vercel
+## 3. Construir el APK de Android
 
-### Configurar variable de entorno
+### Configurar entorno
 
-1. Ir a vercel.com > New Project > Importar repositorio
-2. En Environment Variables agregar:
-   - **Key**: `VITE_API_URL`
-   - **Value**: `https://medicerca-backend.onrender.com`
-3. Deploy
+```bash
+# Java 21 (necesario para Android build)
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+
+# Flutter
+export PATH="/home/leandro/development/flutter/bin:$PATH"
+```
+
+### Build release
+
+```bash
+cd medicerca_flutter
+
+# Build APK release con R8 minification
+flutter build apk --release
+```
+
+El APK se genera en:
+```
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+Copiar a la raiz del proyecto:
+```bash
+cp build/app/outputs/flutter-apk/app-release.apk ../MediCerca-Release.apk
+```
+
+### Firma del APK
+
+El APK esta firmado con un keystore propio. La configuracion esta en:
+- `android/app/release-key.jks` (keystore)
+- `android/key.properties` (credenciales)
+- `android/app/build.gradle.kts` (configuracion de firma)
+
+`key.properties` NO se sube a git (esta en `.gitignore`).
+
+### Instalar en celular
+
+1. Copiar `MediCerca-Release.apk` al celular
+2. Abrir el archivo APK
+3. Permitir instalacion desde fuentes desconocidas
+4. Pulsa Instalar
 
 ## 4. Desarrollo Local
 
@@ -83,27 +128,55 @@ npm run dev
 
 El backend arranca en `http://localhost:3000`.
 
-### Frontend
+### Flutter (emulador o dispositivo)
 
 ```bash
-cd frontend
-npm install
+cd medicerca_flutter
 
-# Crear archivo .env
-echo 'VITE_API_URL=http://localhost:3000' > .env
+# Verificar entorno
+flutter doctor
 
-npm run dev
+# Ejecutar en modo desarrollo
+flutter run
 ```
 
-La app abre en `http://localhost:5173`. El proxy de Vite redirige `/api/*` al backend.
+## 5. Cuentas de prueba
 
-## 5. Troubleshooting
+| Usuario | Email | Password | Rol |
+|---|---|---|---|
+| Dr. Carlos Garcia | `doctor.garcia@medicerca.com` | `medicerca123` | Doctor |
+| Dr. Ana Martinez | `doctor.martinez@medicerca.com` | `medicerca123` | Doctor |
+| Maria Lopez | `maria@test.com` | `medicerca123` | Paciente |
+| Juan Perez | `juan@test.com` | `medicerca123` | Paciente |
+| Test | `testflutter@test.com` | `123456` | Paciente |
+
+## 6. Git
+
+El APK (`*.apk`) esta en `.gitignore` y no se sube al repositorio.
+
+Para subir cambios:
+```bash
+git add -A
+git commit -m "descripcion del cambio"
+git push origin main
+```
+
+Si el historial tiene APKs que quieres eliminar:
+```bash
+git filter-repo --path-glob '*.apk' --invert-paths
+git push origin main --force
+```
+
+## 7. Troubleshooting
 
 | Problema | Solucion |
 |---|---|
 | `ECONNREFUSED` | Verificar que el backend esta corriendo |
 | `JWT verification failed` | Verificar JWT_SECRET en Render |
 | `Database connection failed` | Verificar DATABASE_URL en Render |
-| Build falla | Ejecutar `npm install` en la carpeta correspondiente |
+| Build falla (backend) | Ejecutar `npm install` en la carpeta backend |
 | CORS error | Verificar CORS_ORIGIN o que el frontend apunta al backend correcto |
 | Render free tier sleeping | El primer request puede tardar ~30s en despertar |
+| Flutter build falla | Verificar `flutter doctor` y Java 21 |
+| `INTERNET` permission error | Verificar `android/app/src/main/AndroidManifest.xml` tiene `<uses-permission android:name="android.permission.INTERNET"/>` |
+| APK muy grande (~50MB) | Normal para Flutter release con R8 minification |

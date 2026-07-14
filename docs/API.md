@@ -22,9 +22,12 @@ Crear una cuenta nueva.
 {
   "email": "jose@ramirez.com",
   "password": "mi password",
-  "fullName": "Jose Ramirez"
+  "fullName": "Jose Ramirez",
+  "role": "patient"
 }
 ```
+
+El campo `role` es opcional. Valores validos: `"patient"` (default) o `"doctor"`.
 
 **Response 201:**
 ```json
@@ -33,7 +36,8 @@ Crear una cuenta nueva.
   "user": {
     "id": 1,
     "email": "jose@ramirez.com",
-    "fullName": "Jose Ramirez"
+    "fullName": "Jose Ramirez",
+    "role": "patient"
   }
 }
 ```
@@ -63,7 +67,8 @@ Iniciar sesion.
   "user": {
     "id": 1,
     "email": "jose@ramirez.com",
-    "fullName": "Jose Ramirez"
+    "fullName": "Jose Ramirez",
+    "role": "patient"
   }
 }
 ```
@@ -84,11 +89,11 @@ Agendar una cita.
 ```json
 {
   "type": "general",
-  "slotId": "1",
-  "doctor": "Dra. Adriana Solis",
-  "clinic": "Centro Medico Norte, Sala 3"
+  "slotId": 1
 }
 ```
+
+Valores validos para `type`: `"general"`, `"followup"`, `"emergency"`.
 
 **Response 201:**
 ```json
@@ -107,9 +112,11 @@ Listar todas las citas del usuario autenticado.
   {
     "id": 1,
     "type": "general",
-    "slot_id": "1",
+    "slot_id": 1,
     "doctor": "Dra. Adriana Solis",
     "clinic": "Centro Medico Norte, Sala 3",
+    "date": "2026-07-14",
+    "time": "10:00",
     "confirmed_at": "2026-07-13T10:30:00Z"
   }
 ]
@@ -135,7 +142,7 @@ Eliminar una cita.
 
 ### GET /api/prescriptions
 
-Listar recetas del usuario.
+Listar recetas del usuario autenticado.
 
 **Response 200:**
 ```json
@@ -152,13 +159,51 @@ Listar recetas del usuario.
 
 ---
 
+### GET /api/prescriptions/created
+
+Listar recetas creadas por el doctor autenticado. Solo doctores.
+
+**Response 200:**
+```json
+[
+  {
+    "id": 1,
+    "medication": "Ibuprofeno 400mg",
+    "frequency": "Cada 8 horas",
+    "refills": 3,
+    "date": "2026-07-13",
+    "patientName": "Maria Lopez"
+  }
+]
+```
+
+---
+
+### GET /api/prescriptions/patients
+
+Listar pacientes unicos del doctor autenticado (derivado de sus recetas). Solo doctores.
+
+**Response 200:**
+```json
+[
+  {
+    "id": 5,
+    "fullName": "Maria Lopez",
+    "email": "maria@test.com"
+  }
+]
+```
+
+---
+
 ### POST /api/prescriptions
 
-Crear una receta.
+Crear una receta. Solo doctores.
 
 **Request:**
 ```json
 {
+  "patientId": 5,
   "medication": "Ibuprofeno 400mg",
   "frequency": "Cada 8 horas",
   "refills": 3
@@ -167,8 +212,19 @@ Crear una receta.
 
 **Response 201:**
 ```json
-{ "id": 4 }
+{
+  "prescription": {
+    "id": 4,
+    "medication": "Ibuprofeno 400mg",
+    "frequency": "Cada 8 horas",
+    "refills": 3,
+    "date": "2026-07-13"
+  }
+}
 ```
+
+**Errores:**
+- `403` — Solo doctores pueden crear recetas
 
 ---
 
@@ -181,10 +237,12 @@ Solicitar servicio a domicilio.
 **Request:**
 ```json
 {
-  "serviceType": "Consulta domiciliaria",
+  "serviceType": "nursing",
   "address": "Av. Insurgentes 1234"
 }
 ```
+
+Valores validos para `serviceType`: `"nursing"`, `"lab"`, `"physiotherapy"`, `"medication"`.
 
 **Response 201:**
 ```json
@@ -202,7 +260,7 @@ Listar servicios del usuario.
 [
   {
     "id": 1,
-    "service_type": "Consulta domiciliaria",
+    "service_type": "nursing",
     "address": "Av. Insurgentes 1234",
     "status": "pending",
     "created_at": "2026-07-13T11:00:00Z"
@@ -226,10 +284,15 @@ Listar servicios del usuario.
 ## Ejemplos con curl
 
 ```bash
-# Registrar
+# Registrar paciente
 curl -X POST https://medicerca-backend.onrender.com/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"demo@medicerca.com","password":"demo123","fullName":"Demo"}'
+  -d '{"email":"demo@medicerca.com","password":"demo123","fullName":"Demo User","role":"patient"}'
+
+# Registrar doctor
+curl -X POST https://medicerca-backend.onrender.com/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"doctor@medicerca.com","password":"demo123","fullName":"Dr. Demo","role":"doctor"}'
 
 # Login
 curl -X POST https://medicerca-backend.onrender.com/api/auth/login \
@@ -240,5 +303,15 @@ curl -X POST https://medicerca-backend.onrender.com/api/auth/login \
 curl -X POST https://medicerca-backend.onrender.com/api/appointments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{"type":"general","slotId":"1","doctor":"Dra. Solis","clinic":"Centro Norte"}'
+  -d '{"type":"general","slotId":1}'
+
+# Crear receta (doctor)
+curl -X POST https://medicerca-backend.onrender.com/api/prescriptions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"patientId":5,"medication":"Ibuprofeno 400mg","frequency":"Cada 8 horas","refills":3}'
+
+# Ver pacientes del doctor
+curl https://medicerca-backend.onrender.com/api/prescriptions/patients \
+  -H "Authorization: Bearer <token>"
 ```
