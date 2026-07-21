@@ -9,7 +9,6 @@ import 'login_screen.dart';
 import 'inicio_screen.dart';
 import 'doctor_dashboard_screen.dart';
 import 'recetas_screen.dart';
-import 'asistencia_screen.dart';
 import 'citas_screen.dart';
 import 'perfil_screen.dart';
 import 'crear_receta_screen.dart';
@@ -35,7 +34,6 @@ class _MainShellBody extends StatelessWidget {
         InicioScreen(),
         CitasScreen(),
         RecetasScreen(),
-        AsistenciaScreen(),
         PerfilScreen(),
       ];
 
@@ -134,12 +132,6 @@ class AppSidebar extends StatelessWidget {
             active: appState.currentTab == 2,
             onTap: () => appState.switchTab(2),
           ),
-          _SidebarItem(
-            icon: Icons.medical_services_outlined,
-            label: 'Servicios',
-            active: appState.currentTab == 3,
-            onTap: () => appState.switchTab(3),
-          ),
           if (isDoctor) ...[
             const Divider(color: Color(0xFF334155), height: 1, indent: 16, endIndent: 16),
             _SidebarItem(
@@ -169,8 +161,8 @@ class AppSidebar extends StatelessWidget {
           _SidebarItem(
             icon: Icons.person_outline,
             label: 'Perfil',
-            active: appState.currentTab == 4,
-            onTap: () => appState.switchTab(4),
+            active: appState.currentTab == 3,
+            onTap: () => appState.switchTab(3),
           ),
           const Spacer(),
           Container(

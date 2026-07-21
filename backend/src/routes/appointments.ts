@@ -6,7 +6,7 @@ const router = Router();
 router.use(authMiddleware);
 
 router.post("/", async (req: AuthRequest, res) => {
-  const { type, slotId, doctor, clinic, doctorId, date, time } = req.body;
+  const { type, slotId, doctor, clinic, doctorId, date, time, serviceType } = req.body;
 
   if (!type || !slotId || !doctor || !clinic) {
     res.status(400).json({ error: "Faltan campos: type, slotId, doctor, clinic" });
@@ -15,8 +15,8 @@ router.post("/", async (req: AuthRequest, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO appointments (user_id, doctor_id, type, slot_id, doctor, clinic, date, time) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-      [req.userId, doctorId || null, type, slotId, doctor, clinic, date || null, time || null]
+      "INSERT INTO appointments (user_id, doctor_id, type, slot_id, doctor, clinic, date, time, service_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+      [req.userId, doctorId || null, type, slotId, doctor, clinic, date || null, time || null, serviceType || null]
     );
     res.status(201).json({ id: result.rows[0].id });
   } catch (err) {
@@ -28,7 +28,7 @@ router.post("/", async (req: AuthRequest, res) => {
 router.get("/", async (req: AuthRequest, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, type, slot_id, doctor, clinic, date, time, confirmed_at, doctor_id FROM appointments WHERE user_id = $1 ORDER BY confirmed_at DESC",
+      "SELECT id, type, slot_id, doctor, clinic, date, time, confirmed_at, doctor_id, service_type FROM appointments WHERE user_id = $1 ORDER BY confirmed_at DESC",
       [req.userId]
     );
     res.json(result.rows);
@@ -41,7 +41,7 @@ router.get("/", async (req: AuthRequest, res) => {
 router.get("/doctor", async (req: AuthRequest, res) => {
   try {
     const result = await pool.query(
-      `SELECT a.id, a.type, a.slot_id, a.doctor, a.clinic, a.date, a.time, a.confirmed_at, a.user_id, a.doctor_id,
+      `SELECT a.id, a.type, a.slot_id, a.doctor, a.clinic, a.date, a.time, a.confirmed_at, a.user_id, a.doctor_id, a.service_type,
               u.full_name as patient_name, u.email as patient_email
        FROM appointments a
        JOIN users u ON u.id = a.user_id

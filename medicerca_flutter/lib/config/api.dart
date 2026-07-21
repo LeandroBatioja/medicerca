@@ -98,6 +98,7 @@ class ApiClient {
     int? doctorId,
     String? date,
     String? time,
+    String? serviceType,
   }) async {
     final res = await _post('/api/appointments', body: {
       'slotId': slotId,
@@ -107,6 +108,7 @@ class ApiClient {
       if (doctorId != null) 'doctorId': doctorId,
       if (date != null) 'date': date,
       if (time != null) 'time': time,
+      if (serviceType != null) 'serviceType': serviceType,
     });
     final body = await _handleResponse(res);
     if (body is! Map<String, dynamic>) throw ApiException('Respuesta invalida');

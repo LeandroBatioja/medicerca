@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/constants.dart';
 import '../config/models.dart';
 import '../providers/app_state.dart';
@@ -25,16 +26,16 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
       description: 'Revision medica general',
     ),
     _TypeOption(
-      type: 'followup',
-      icon: Icons.autorenew,
-      title: 'Seguimiento',
-      description: 'Seguimiento de tratamiento',
+      type: 'specialty',
+      icon: Icons.psychology_outlined,
+      title: 'Consulta por Especialidad',
+      description: 'Evaluacion de especialista',
     ),
     _TypeOption(
-      type: 'emergency',
-      icon: Icons.emergency_outlined,
-      title: 'Urgencia',
-      description: 'Atencion urgente',
+      type: 'checkup',
+      icon: Icons.health_and_safety_outlined,
+      title: 'Chequeo Preventivo',
+      description: 'Revision de salud preventiva',
     ),
   ];
 
@@ -110,11 +111,16 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                       child: Container(height: 3, color: AppColors.border)),
                   const SizedBox(width: 6),
                   _ProgressDot(active: false),
+                  const SizedBox(width: 6),
+                  Expanded(
+                      child: Container(height: 3, color: AppColors.border)),
+                  const SizedBox(width: 6),
+                  _ProgressDot(active: false),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                'Paso 1 de 3',
+                'Paso 1 de 4',
                 style: GoogleFonts.dmSans(
                   fontSize: AppFontSize.body,
                   color: AppColors.textTertiary,
@@ -205,6 +211,57 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
                         ),
                       );
                     }),
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () => _showEmergencyDialog(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.red.withAlpha(20),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(Icons.phone_outlined,
+                                  color: Colors.red.shade600, size: 24),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Urgencia',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: AppFontSize.body,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.red.shade700,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Llamar linea de emergencias',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: AppFontSize.body,
+                                      color: Colors.red.shade400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.chevron_right,
+                                color: Colors.red.shade400, size: 24),
+                          ],
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       'Doctor',
@@ -319,6 +376,58 @@ class _FormStep1ScreenState extends State<FormStep1Screen> {
     } catch (_) {
       return null;
     }
+  }
+
+  void _showEmergencyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.emergency_outlined, color: Colors.red.shade600, size: 24),
+            const SizedBox(width: 10),
+            Text(
+              'Urgencia',
+              style: GoogleFonts.dmSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Si es una emergencia medica, llama directamente a la linea de emergencias.',
+          style: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancelar',
+              style: GoogleFonts.dmSans(fontSize: 14),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              launchEmergencyCall();
+            },
+            icon: const Icon(Icons.phone, size: 18),
+            label: const Text('Llamar ahora'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void launchEmergencyCall() {
+    const number = 'tel:911';
+    launchUrl(Uri.parse(number));
   }
 }
 

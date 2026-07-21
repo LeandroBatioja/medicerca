@@ -248,6 +248,14 @@ class _CitasScreenState extends State<CitasScreen> {
                   icon: Icons.schedule,
                   label: 'Hora',
                   value: appointment.time ?? 'Sin hora'),
+              if (appointment.serviceType != null &&
+                  appointment.serviceDisplay.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _DetailRow(
+                    icon: Icons.medical_services_outlined,
+                    label: 'Servicio',
+                    value: appointment.serviceDisplay),
+              ],
               const SizedBox(height: 12),
               _DetailRow(
                 icon: appointment.confirmed
@@ -389,10 +397,10 @@ class _AppointmentCard extends StatelessWidget {
     switch (appointment.type) {
       case 'general':
         return AppColors.primary;
-      case 'followup':
+      case 'specialty':
         return AppColors.success;
-      case 'emergency':
-        return AppColors.warning;
+      case 'checkup':
+        return const Color(0xFF6366F1);
       default:
         return AppColors.primary;
     }
@@ -402,10 +410,10 @@ class _AppointmentCard extends StatelessWidget {
     switch (appointment.type) {
       case 'general':
         return Icons.medical_services_outlined;
-      case 'followup':
-        return Icons.autorenew;
-      case 'emergency':
-        return Icons.emergency_outlined;
+      case 'specialty':
+        return Icons.psychology_outlined;
+      case 'checkup':
+        return Icons.health_and_safety_outlined;
       default:
         return Icons.event;
     }

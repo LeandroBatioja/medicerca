@@ -16,7 +16,6 @@ class InicioScreen extends StatefulWidget {
 class _InicioScreenState extends State<InicioScreen> {
   List<Appointment> _appointments = [];
   List<Prescription> _prescriptions = [];
-  List<HomeService> _services = [];
   bool _loading = true;
   String? _error;
   int _lastLoadedTab = -1;
@@ -43,13 +42,11 @@ class _InicioScreenState extends State<InicioScreen> {
       final results = await Future.wait([
         appState.api.getAppointments(),
         appState.api.getPrescriptions(),
-        appState.api.getHomeServices(),
       ]);
       if (mounted) {
         setState(() {
           _appointments = results[0] as List<Appointment>;
           _prescriptions = results[1] as List<Prescription>;
-          _services = results[2] as List<HomeService>;
           _loading = false;
           _error = null;
         });
@@ -141,13 +138,6 @@ class _InicioScreenState extends State<InicioScreen> {
                   ),
                   const SizedBox(width: 12),
                   _QuickAction(
-                    icon: Icons.medical_services_outlined,
-                    label: 'Servicios',
-                    color: AppColors.warning,
-                    onTap: () => appState.switchTab(3),
-                  ),
-                  const SizedBox(width: 12),
-                  _QuickAction(
                     icon: Icons.headset_mic_outlined,
                     label: 'Ayuda',
                     color: const Color(0xFF8B5CF6),
@@ -160,6 +150,8 @@ class _InicioScreenState extends State<InicioScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
+              _WeeklyCalendar(appointments: _appointments),
               const SizedBox(height: 20),
               if (_loading)
                 const Center(
@@ -305,14 +297,6 @@ class _InicioScreenState extends State<InicioScreen> {
                         value: '${_prescriptions.length}',
                         label: 'Recetas',
                         color: AppColors.success,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _StatCard(
-                        value: '${_services.length}',
-                        label: 'Servicios',
-                        color: AppColors.warning,
                       ),
                     ),
                   ],
@@ -548,6 +532,131 @@ class _ActivityTile extends StatelessWidget {
                 color: AppColors.textTertiary,
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WeeklyCalendar extends StatelessWidget {
+  final List<Appointment> appointments;
+  const _WeeklyCalendar({required this.appointments});
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final dayNames = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
+
+    final appointmentDays = <int>{};
+    for (final a in appointments) {
+      if (a.date != null) {
+        for (int i = 0; i < 7; i++) {
+          final dayName = a.date!.toLowerCase();
+          if ((dayName == 'lunes' && i == 0) ||
+              (dayName == 'martes' && i == 1) ||
+              (dayName == 'miercoles' && i == 2) ||
+              (dayName == 'jueves' && i == 3) ||
+              (dayName == 'viernes' && i == 4) ||
+              (dayName == 'sabado' && i == 5) ||
+              (dayName == 'domingo' && i == 6)) {
+            appointmentDays.add(i);
+          }
+        }
+      }
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.calendar_today_outlined,
+                  size: 18, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Text(
+                'Semana actual',
+                style: GoogleFonts.dmSans(
+                  fontSize: AppFontSize.body,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(7, (i) {
+              final day = startOfWeek.add(Duration(days: i));
+              final isToday = day.day == now.day &&
+                  day.month == now.month &&
+                  day.year == now.year;
+              final hasAppointment = appointmentDays.contains(i);
+              return Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      dayNames[i],
+                      style: GoogleFonts.dmSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: isToday
+                            ? AppColors.primary
+                            : hasAppointment
+                                ? AppColors.primaryBg
+                                : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                        border: hasAppointment && !isToday
+                            ? Border.all(color: AppColors.primary, width: 1.5)
+                            : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${day.day}',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: isToday
+                                ? Colors.white
+                                : hasAppointment
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (hasAppointment) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ] else
+                      const SizedBox(height: 10),
+                  ],
+                ),
+              );
+            }),
+          ),
         ],
       ),
     );

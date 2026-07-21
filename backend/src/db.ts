@@ -36,6 +36,7 @@ export async function initDB() {
       ALTER TABLE appointments ADD COLUMN IF NOT EXISTS doctor_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
       ALTER TABLE appointments ADD COLUMN IF NOT EXISTS date TEXT;
       ALTER TABLE appointments ADD COLUMN IF NOT EXISTS time TEXT;
+      ALTER TABLE appointments ADD COLUMN IF NOT EXISTS service_type TEXT;
 
       CREATE TABLE IF NOT EXISTS prescriptions (
         id SERIAL PRIMARY KEY,

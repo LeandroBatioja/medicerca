@@ -52,6 +52,7 @@ class Appointment {
   final int? doctorId;
   final String? patientName;
   final String? patientEmail;
+  final String? serviceType;
 
   Appointment({
     required this.id,
@@ -65,6 +66,7 @@ class Appointment {
     this.doctorId,
     this.patientName,
     this.patientEmail,
+    this.serviceType,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -80,6 +82,7 @@ class Appointment {
       doctorId: json['doctor_id'],
       patientName: json['patient_name'],
       patientEmail: json['patient_email'],
+      serviceType: json['service_type'],
     );
   }
 
@@ -87,12 +90,31 @@ class Appointment {
     switch (type) {
       case 'general':
         return 'Consulta General';
-      case 'followup':
-        return 'Seguimiento';
-      case 'emergency':
-        return 'Urgencia';
+      case 'specialty':
+        return 'Consulta por Especialidad';
+      case 'checkup':
+        return 'Chequeo Preventivo';
       default:
         return type;
+    }
+  }
+
+  String get serviceDisplay {
+    switch (serviceType) {
+      case 'nursing':
+        return 'Atencion de enfermeria';
+      case 'lab':
+        return 'Laboratorio clinico';
+      case 'imaging':
+        return 'Estudios de imagen';
+      case 'procedure':
+        return 'Procedimiento medico';
+      case 'vaccination':
+        return 'Vacunacion';
+      case 'physiotherapy':
+        return 'Fisioterapia';
+      default:
+        return '';
     }
   }
 }
@@ -186,13 +208,17 @@ class HomeService {
   String get displayType {
     switch (serviceType) {
       case 'nursing':
-        return 'Enfermeria';
+        return 'Atencion de enfermeria';
       case 'lab':
-        return 'Laboratorio';
+        return 'Laboratorio clinico';
+      case 'imaging':
+        return 'Estudios de imagen';
+      case 'procedure':
+        return 'Procedimiento medico';
+      case 'vaccination':
+        return 'Vacunacion';
       case 'physiotherapy':
         return 'Fisioterapia';
-      case 'medication':
-        return 'Medicamentos';
       default:
         return serviceType;
     }
@@ -231,16 +257,20 @@ class Booking {
   final String? doctor;
   final String? clinic;
   final int? doctorId;
+  final String? serviceType;
+  final String? serviceName;
 
-  const Booking({this.type = '', this.slot, this.doctor, this.clinic, this.doctorId});
+  const Booking({this.type = '', this.slot, this.doctor, this.clinic, this.doctorId, this.serviceType, this.serviceName});
 
-  Booking copyWith({String? type, Slot? slot, bool clearSlot = false, String? doctor, String? clinic, int? doctorId}) {
+  Booking copyWith({String? type, Slot? slot, bool clearSlot = false, String? doctor, String? clinic, int? doctorId, String? serviceType, String? serviceName, bool clearService = false}) {
     return Booking(
       type: type ?? this.type,
       slot: clearSlot ? null : (slot ?? this.slot),
       doctor: doctor ?? this.doctor,
       clinic: clinic ?? this.clinic,
       doctorId: doctorId ?? this.doctorId,
+      serviceType: clearService ? null : (serviceType ?? this.serviceType),
+      serviceName: clearService ? null : (serviceName ?? this.serviceName),
     );
   }
 }

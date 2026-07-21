@@ -14,23 +14,51 @@ class FormStep2Screen extends StatefulWidget {
 }
 
 class _FormStep2ScreenState extends State<FormStep2Screen> {
-  int? _selectedSlotId;
+  String? _selectedType;
 
-  static const _slots = [
-    Slot(id: 1, day: 'Lunes', time: '09:00 AM'),
-    Slot(id: 2, day: 'Lunes', time: '11:00 AM'),
-    Slot(id: 3, day: 'Martes', time: '10:00 AM'),
-    Slot(id: 4, day: 'Martes', time: '02:00 PM'),
-    Slot(id: 5, day: 'Miercoles', time: '09:00 AM'),
-    Slot(id: 6, day: 'Miercoles', time: '03:00 PM'),
-    Slot(id: 7, day: 'Jueves', time: '10:00 AM'),
-    Slot(id: 8, day: 'Viernes', time: '09:00 AM'),
-    Slot(id: 9, day: 'Viernes', time: '11:00 AM'),
+  final _serviceTypes = [
+    _ServiceOption(
+      value: 'lab',
+      label: 'Laboratorio clinico',
+      icon: Icons.science_outlined,
+      description: 'Analisis y toma de muestras',
+    ),
+    _ServiceOption(
+      value: 'imaging',
+      label: 'Estudios de imagen',
+      icon: Icons.camera_alt_outlined,
+      description: 'Rayos X, ultrasonido, resonancia',
+    ),
+    _ServiceOption(
+      value: 'nursing',
+      label: 'Atencion de enfermeria',
+      icon: Icons.healing_outlined,
+      description: 'Curaciones, inyecciones, cuidados',
+    ),
+    _ServiceOption(
+      value: 'procedure',
+      label: 'Procedimiento medico',
+      icon: Icons.medical_information_outlined,
+      description: 'Procedimientos ambulatorios',
+    ),
+    _ServiceOption(
+      value: 'vaccination',
+      label: 'Vacunacion',
+      icon: Icons.vaccines_outlined,
+      description: 'Aplicacion de vacunas',
+    ),
+    _ServiceOption(
+      value: 'physiotherapy',
+      label: 'Fisioterapia',
+      icon: Icons.sports_gymnastics_outlined,
+      description: 'Rehabilitacion y terapia fisica',
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final selectedType = _selectedType ?? appState.booking.serviceType;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -48,7 +76,7 @@ class _FormStep2ScreenState extends State<FormStep2Screen> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Seleccionar horario',
+                    'Servicio',
                     style: GoogleFonts.lora(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -61,11 +89,7 @@ class _FormStep2ScreenState extends State<FormStep2Screen> {
               Padding(
                 padding: const EdgeInsets.only(left: 48),
                 child: Text(
-                  appState.booking.type == 'general'
-                      ? 'Consulta General'
-                      : appState.booking.type == 'followup'
-                          ? 'Seguimiento'
-                          : 'Urgencia',
+                  'Que servicio necesita el paciente',
                   style:
                       GoogleFonts.dmSans(fontSize: 13, color: AppColors.textSecondary),
                 ),
@@ -84,72 +108,162 @@ class _FormStep2ScreenState extends State<FormStep2Screen> {
                     Expanded(child: Container(height: 3, color: AppColors.border)),
                     const SizedBox(width: 6),
                     _ProgressDot(active: false),
+                    const SizedBox(width: 6),
+                    Expanded(child: Container(height: 3, color: AppColors.border)),
+                    const SizedBox(width: 6),
+                    _ProgressDot(active: false),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: ListView.separated(
-                  itemCount: _slots.length,
-                  separatorBuilder: (_, index) => const SizedBox(height: 8),
-                  itemBuilder: (context, i) {
-                    final slot = _slots[i];
-                    final isSelected = _selectedSlotId == slot.id;
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedSlotId = slot.id),
+                child: ListView(
+                  children: [
+                    ...List.generate(_serviceTypes.length, (i) {
+                      final s = _serviceTypes[i];
+                      final isSelected = selectedType == s.value;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: GestureDetector(
+                          onTap: () => setState(() => _selectedType = s.value),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primaryBg
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.border,
+                                width: isSelected ? 2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.primary.withAlpha(20)
+                                        : AppColors.bg,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    s.icon,
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : AppColors.textSecondary,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        s.label,
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: AppFontSize.body,
+                                          fontWeight: FontWeight.w600,
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      Text(
+                                        s.description,
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: AppFontSize.body,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (isSelected)
+                                  const Icon(Icons.check_circle,
+                                      color: AppColors.primary, size: 24),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () => setState(() => _selectedType = null),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.primaryBg : Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          color: selectedType == null
+                              ? AppColors.primaryBg
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isSelected ? AppColors.primary : AppColors.border,
-                            width: isSelected ? 2 : 1,
+                            color: selectedType == null
+                                ? AppColors.primary
+                                : AppColors.border,
+                            width: selectedType == null ? 2 : 1,
                           ),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.access_time,
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : AppColors.textTertiary,
-                              size: 20,
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: selectedType == null
+                                    ? AppColors.primary.withAlpha(20)
+                                    : AppColors.bg,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                Icons.not_interested_outlined,
+                                color: selectedType == null
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                                size: 24,
+                              ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${slot.day}, ${slot.time}',
+                                    'Ninguno',
                                     style: GoogleFonts.dmSans(
-                                      fontSize: 14,
+                                      fontSize: AppFontSize.body,
                                       fontWeight: FontWeight.w600,
-                                      color: isSelected
+                                      color: selectedType == null
                                           ? AppColors.primary
                                           : AppColors.textPrimary,
                                     ),
                                   ),
                                   Text(
-                                    'Disponible',
+                                    'Solo consulta',
                                     style: GoogleFonts.dmSans(
-                                      fontSize: 11,
-                                      color: AppColors.success,
+                                      fontSize: AppFontSize.body,
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            if (isSelected)
+                            if (selectedType == null)
                               const Icon(Icons.check_circle,
-                                  color: AppColors.primary, size: 20),
+                                  color: AppColors.primary, size: 24),
                           ],
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 12),
@@ -157,19 +271,25 @@ class _FormStep2ScreenState extends State<FormStep2Screen> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: _selectedSlotId == null
-                      ? null
-                      : () {
-                          final slot =
-                              _slots.firstWhere((s) => s.id == _selectedSlotId);
-                          appState.updateBooking(
-                              appState.booking.copyWith(slot: slot));
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const FormStep3Screen()),
-                          );
-                        },
+                  onPressed: () {
+                    String? serviceName;
+                    if (_selectedType != null) {
+                      final match = _serviceTypes.where((s) => s.value == _selectedType);
+                      serviceName = match.isNotEmpty ? match.first.label : _selectedType;
+                    }
+                    appState.updateBooking(
+                      appState.booking.copyWith(
+                        serviceType: _selectedType,
+                        serviceName: serviceName,
+                        clearService: _selectedType == null,
+                      ),
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const FormStep3Screen()),
+                    );
+                  },
                   child: const Text('Siguiente'),
                 ),
               ),
@@ -196,4 +316,17 @@ class _ProgressDot extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ServiceOption {
+  final String value;
+  final String label;
+  final IconData icon;
+  final String description;
+  const _ServiceOption({
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.description,
+  });
 }
